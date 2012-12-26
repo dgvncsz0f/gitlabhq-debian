@@ -1,0 +1,9 @@
+/tmp/
+/debian/gitlabhq/
+/debian/gitlabhq-gitolite/
+/build-gitlabhq
+/install-gitlabhq
+/install-gitolite
+/debian/files
+/debian/*.debhelper.log
+/debian/*.substvars
