@@ -2,7 +2,7 @@
 
 set -e
 
-githome=/var/lib/gitlabhq-giolite
+githome=/var/lib/gitlabhq-gitolite
 
 adduser --system               \
         --shell /bin/sh        \
@@ -50,7 +50,7 @@ test -f /home/gitlab/.gitconfig || {
 }
 
 test -h /var/www/gitlabhq/log || {
-  ln -s /var/log/gitlabhq /var/log/www/gitlabhq/log
+  ln -s /var/log/gitlabhq /var/www/gitlabhq/log
 }
 
 test -d /var/www/gitlabhq/tmp || {
