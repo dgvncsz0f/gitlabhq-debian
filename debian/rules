@@ -57,13 +57,13 @@ pre-install:
 
 install-gitolite:
 	mkdir -p $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite
-	mkdir -p $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite/src
+	mkdir -p $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite/gitolite/src
 	mkdir -p $(debroot)/gitlabhq-gitolite/var/log/gitlabhq-gitolite
 	mkdir -p $(debroot)/gitlabhq-gitolite/usr/bin
 	touch $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite/.profile
 	chown 0750 $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite
 	$(runinstall) $(srcroot)/source/gitolite.git/src $(debroot)/gitlabhq-gitolite/usr/share/gitlabhq-gitolite
-	$(getversion)                                   >$(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite/src/VERSION
+	$(getversion)                                   >$(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite/gitolite/src/VERSION
 	$(runinstall) $(srcroot)/source/gitolite/libexec $(debroot)/gitlabhq-gitolite/usr/libexec/gitlabhq-gitolite
 	ln -s ../share/gitlabhq-gitolite/gitolite $(debroot)/gitlabhq-gitolite/usr/bin/gitolite
 	touch install-gitolite

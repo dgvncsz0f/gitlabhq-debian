@@ -37,6 +37,9 @@ To invoke any binary (bundle, rake etc.) use:
   $ sudo -u gitlab -H /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info
   $ sudo -u gitlab -H /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info RAILS_ENV=production
 
+  # to access rails console
+  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env rails console
+
   # To use something other than production
   $ env RAILS_ENV=custom /usr/libexec/gitlabhq/env ...
 
