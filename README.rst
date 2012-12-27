@@ -14,6 +14,36 @@ dependency, it only required `ruby1.9.1`.
 The postinst script is able to configure everything, using debconf. So
 it should be a fairly straightforward process.
 
+Changes from official installer
+===============================
+
+Home dirs
+---------
+
+:gitlab: /var/lib/gitlabhq
+:gitolite: /var/lib/gitlabhq-gitolite
+:rails: /var/www/gitlabhq
+
+Binaries
+--------
+
+:gems: /var/www/gitlabhq/vendor/bin
+
+To invoke any binary (bundle, rake etc.) use:
+::
+
+  # the following are all the same
+  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env rake gitlab:env:info
+  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info
+  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info RAILS_ENV=production
+
+  # To use something other than production
+  $ env RAILS_ENV=custom /usr/libexec/gitlabhq/env ...
+
+This script makes sure the PATH and RAILS_ENV variables are defined:
+
+* https://github.com/dgvncsz0f/gitlabhq-debian/blob/master/source/gitlabhq/libexec/env
+
 Available packages
 ==================
 

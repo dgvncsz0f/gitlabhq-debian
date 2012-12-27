@@ -20,7 +20,7 @@ chown git:git $githome
 test -d $githome/repositories || {
   mkdir $githome/repositories
   chown git:git $githome/repositories
-  chmod ug+rwXs $githome/repositories
+  chmod ug+rwXs,o-rwx $githome/repositories
 }
 
 test -d $githome/.gitolite || {

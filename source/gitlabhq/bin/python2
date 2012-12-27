@@ -1,0 +1,12 @@
+#!/bin/sh
+
+python2_test_x () {
+  command -v "$1" >/dev/null 2>/dev/null
+}
+
+for bin_python in python2.7 python2.6 python2.5
+do
+  python2_test_x $bin_python && exec $bin_python "$@"
+done
+
+exit 1
