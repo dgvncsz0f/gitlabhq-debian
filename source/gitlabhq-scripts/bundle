@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec env GEM_HOME=/var/www/gitlabhq/vendor/0 /var/www/gitlabhq/vendor/bin/bundle "$@"

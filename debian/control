@@ -8,11 +8,11 @@ Homepage: https://github.com/gitlabhq/gitolite
 
 Package: gitlabhq-gitolite
 Architecture: all
-Depends: ${misc:Depends}, git (>= 1.6.6), perl (>= 5.8.8), openssh (>= 5.0), dash
+Depends: ${misc:Depends}, git (>= 1.6.6), perl (>= 5.8.8), openssh-server (>= 5.0), dash
 Description: Patched for GitLab | Hosting git repositories -- Gitolite allows you to setup git hosting on a central server, with very fine-grained access control and many (many!) more powerful features.
 
 Package: gitlabhq
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, gitlabhq-gitolite (>= 3.2), ruby1.9.1, libmysqlclient16, libpq5, libicu44
+Depends: ${shlibs:Depends}, ${misc:Depends}, gitlabhq-gitolite (>= 3.2), ruby1.9.1, libmysqlclient16, libpq5, libicu44, debconf
 Description: Self hosted Git management software
 

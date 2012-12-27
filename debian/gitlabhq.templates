@@ -1,0 +1,30 @@
+Template: gitlabhq/gitlab/hostname
+Type: string
+Default: localhost
+Description: Webserver hostname
+  The host name the web server is using to serve gitlab
+
+Template: gitlabhq/gitlab/port
+Type: string
+Default: 80
+Description: Werbserver port number
+  The port number the web server is using to serve gitlab
+
+Template: gitlabhq/gitlab/https
+Type: boolean
+Default: false
+Description: Enable HTTP?
+  Set this to true if you plan to require SSL to access to the
+  web interface.
+
+Template: gitlabhq/gitlab/gravatar
+Type: boolean
+Default: true
+Description: Enable gravatar?
+  Gravatar is an online service to manage user avatars. For more
+  information, refer to http://gravatar.com/
+
+Template: gitlabhq/gitlab/email
+Type: string
+Default: gitlab@localhost
+Description: Email address used in the "From" field in mails sent by GitLab

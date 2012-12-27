@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+# coding: utf-8
+
+require "yaml"
+
+mem = YAML.load_file(ARGV[0])
+tmp = mem
+key = ARGV[-2]
+val = ARGV[-1]
+ARGV[1..-3].each {|k| tmp = tmp[k] || {}}
+
+if (val.start_with?("="))
+  tmp[key] = val[1..-1]
+elsif (val.start_with?("+"))
+  if (! tmp[key].is_a?([]))
+    tmp[key] = []
+  end
+  tmp[key] << val[1..-1]
+end
+
+File.open(ARGV[0], "w") {|fh| YAML.dump(mem, fh)}

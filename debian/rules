@@ -10,7 +10,9 @@ bin_git     ?= git
 bin_install ?= install
 bin_env     ?= env
 bin_gem     ?= gem1.9.1
-installsh    = $(srcroot)/source/install.sh
+runinstall   = $(bin_env) bin_find=$(bin_find)       \
+                          bin_install=$(bin_install) \
+                          $(srcroot)/source/install.sh
 
 clean::
 	dh_testdir
@@ -35,9 +37,10 @@ build-gitlabhq:
                            --no-user-install                              \
                            --no-rdoc                                      \
                            --no-ri bundler
-	(cd $(tmproot)/gitlabhq.git && env GEM_HOME=./vendor/0 ./vendor/bin/bundle install --binstubs=./vendor/bin \
-                                                                                           --deployment            \
-                                                                                           --without development test)
+	(cd $(tmproot)/gitlabhq.git && $(bin_env) GEM_HOME=./vendor/0 \
+             ./vendor/bin/bundle install --binstubs=./vendor/bin      \
+                                         --deployment                 \
+                                         --without development test)
 	touch build-gitlabhq
 
 build-gitolite:
@@ -51,26 +54,22 @@ pre-install:
 	dh_installdirs
 
 install-gitolite:
-	$(bin_env) bin_install=$(bin_install) \
-                   bin_find=$(bin_find)       \
-                   $(installsh) $(srcroot)/source/gitolite.git/src $(debroot)/gitlabhq-gitolite/usr/share/gitlabhq-gitolite
+	$(runinstall) $(srcroot)/source/gitolite.git/src $(debroot)/gitlabhq-gitolite/usr/share/gitlabhq-gitolite
+	$(runinstall) $(srcroot)/source/gitolite-scripts $(debroot)/gitlabhq-gitolite/usr/libexec/gitlabhq-gitolite
 	mkdir -p $(debroot)/gitlabhq-gitolite/usr/bin
 	ln -s ../share/gitlabhq-gitolite/gitolite $(debroot)/gitlabhq-gitolite/usr/bin/gitolite
 	touch install-gitolite
 
 install-gitlabhq:
-	for f in app .bundle config db doc features lib public script vendor                                                \
-	         config.ru Gemfile Gemfile.lock Rakefile;                                                                   \
-	do                                                                                                                  \
-	  $(bin_env) bin_find=$(bin_find)                                                                                   \
-	             bin_install=$(bin_install)                                                                             \
-	             $(installsh) $(tmproot)/gitlabhq.git $(debroot)/gitlabhq/var/www/gitlabhq $(tmproot)/gitlabhq.git/$$f; \
-	done
+	for f in app .bundle config db doc features lib public script vendor                                      \
+                 config.ru Gemfile Gemfile.lock Rakefile;                                                         \
+        do                                                                                                        \
+          $(runinstall) $(tmproot)/gitlabhq.git $(debroot)/gitlabhq/var/www/gitlabhq $(tmproot)/gitlabhq.git/$$f; \
+        done
+	$(runinstall) $(srcroot)/source/gitlabhq-scripts $(debroot)/gitlabhq/usr/libexec/gitlabhq
 	touch install-gitlabhq
 
 binary: binary-indep binary-arch
-binary-arch: build install
-binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
@@ -81,5 +80,9 @@ binary-indep: build install
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
+
+binary-arch: build install
+
+binary-indep: build install
 
 .PHONY: clean build build-arch build-indep binary binary-arch binary-indep install

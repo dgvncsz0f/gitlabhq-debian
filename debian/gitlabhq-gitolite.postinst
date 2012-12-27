@@ -1,29 +1,13 @@
-#!/bin/bash
+#!/bin/sh
 
-adduser --system                      \
-        --shell /bin/sh               \
-        --gecos "Git Version Control" \
-        --quiet                       \
-        --group                       \
-        --no-create-home              \
-        --disabled-password           \
-        --home /var/lib/git           \
-        git
+set -e
 
-test -d /var/lib/git || {
-  mkdir /var/lib/git
-  chown git:git /var/lib/git
-  chmod 0750 /var/lib/git
-}
+case "$1" in
 
-test -d /var/lib/git/repositories || {
-  mkdir /var/lib/git/repositories
-  chmod ug+rwXs /var/lib/git/repositories
-}
+  (configure)
 
-test -d /var/lib/git/.gitolite || {
-  mkdir /var/lib/git/.gitolite
-  chmod 750 /var/lib/.gitolite
-}
+    /usr/libexec/gitlabhq-gitolite/postinst
 
-exit 0
+    ;;
+
+esac
