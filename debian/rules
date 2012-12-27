@@ -31,6 +31,10 @@ build-indep: build-gitolite
 pre-build:
 	dh_testdir
 	mkdir -p $(tmproot)
+	if [ -d $(srcroot)/.git ];                                   \
+        then                                                         \
+          $(bin_git) submodule init && $(bin_git) submodule update;  \
+        fi
 
 build-gitlabhq:
 	cp -r $(srcroot)/source/gitlabhq.git $(tmproot)/gitlabhq.git
