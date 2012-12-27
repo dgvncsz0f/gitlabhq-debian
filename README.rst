@@ -2,6 +2,11 @@
  gitlab-debian
 ===============
 
+:todo: Database setup:
+       https://github.com/gitlabhq/gitlabhq/blob/stable/doc/install/databases.md;
+:todo: App initialization: rake gitlab:app:setup RAILS_ENV=production;
+:todo: Create an init script;
+
 Provides a debian binary package for gitlab & gitolite.
 
 Once you build this package, there is no need for `*-dev` packages. In
