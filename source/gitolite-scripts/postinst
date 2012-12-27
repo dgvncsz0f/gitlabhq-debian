@@ -2,6 +2,8 @@
 
 set -e
 
+githome=/var/lib/gitlabhq-gitolite
+
 adduser --system                      \
         --shell /bin/sh               \
         --gecos "Git Version Control" \
@@ -9,26 +11,26 @@ adduser --system                      \
         --group                       \
         --no-create-home              \
         --disabled-password           \
-        --home /var/lib/git           \
+        --home $githome               \
         git
 
 chown git /var/log/gitlabhq-gitolite
 
-test -d /var/lib/git || {
-  mkdir /var/lib/git
-  chown git:git /var/lib/git
-  chmod 0750 /var/lib/git
+test -d $githome || {
+  mkdir $githome
+  chown git:git $githome
+  chmod 0750 $githome
 }
 
-test -d /var/lib/git/repositories || {
-  mkdir /var/lib/git/repositories
-  chown git:git /var/lib/git/repositories
-  chmod ug+rwXs /var/lib/git/repositories
+test -d $githome/repositories || {
+  mkdir $githome/repositories
+  chown git:git $githome/repositories
+  chmod ug+rwXs $githome/repositories
 }
 
-test -d /var/lib/git/.gitolite || {
-  mkdir /var/lib/git/.gitolite
-  ln -s /var/log/gitlabhq-gitolite /var/lib/git/.gitolite/logs
-  chown -R git:git /var/lib/git/.gitolite
-  chmod -R 750 /var/lib/git/.gitolite
+test -d $githome/.gitolite || {
+  mkdir $githome/.gitolite
+  ln -s /var/log/gitlabhq-gitolite $githome/.gitolite/logs
+  chown -R git:git $githome/.gitolite
+  chmod -R 750 $githome/.gitolite
 }

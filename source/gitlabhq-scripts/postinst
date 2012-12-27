@@ -2,6 +2,8 @@
 
 set -e
 
+githome=/var/lib/gitlabhq-giolite
+
 adduser --system               \
         --shell /bin/sh        \
         --gecos "GitLab"       \
@@ -13,10 +15,11 @@ adduser --system               \
         gitlab
 
 usermod -G git gitlab
+
 chown gitlab /var/log/gitlabhq
 
-cp /var/www/gitlabhq/lib/hooks/post-receive /var/lib/git/.gitolite/hooks/common/post-receive
-chown git:git /var/lib/git/.gitolite/hooks/common/post-receive
+cp /var/www/gitlabhq/lib/hooks/post-receive $githome/.gitolite/hooks/common/post-receive
+chown git:git $githome/.gitolite/hooks/common/post-receive
 
 test -d /home/gitlab || {
   mkdir /home/gitlab
@@ -32,8 +35,8 @@ test -d /home/gitlab/.ssh || {
   chmod 0400 /home/gitlab/.ssh/id_rsa
   chmod 0444 /home/gitlab/.ssh/id_rsa.pub
 
-  cp /home/gitlab/.ssh/id_rsa.pub /var/lib/git/gitlab.pub
-  su - -c "gitolite setup -pk /var/lib/git/gitlab.pub" git 1>&2
+  cp /home/gitlab/.ssh/id_rsa.pub $githome/gitlab.pub
+  su - -c "gitolite setup -pk $githome/gitlab.pub" git 1>&2
 }
 
 test -f /home/gitlab/.ssh/config || {
