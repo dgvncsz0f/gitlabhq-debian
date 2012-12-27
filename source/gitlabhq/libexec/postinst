@@ -43,9 +43,27 @@ gitlabhq_mkdirs () {
   }
 
   test -d /var/www/gitlabhq/tmp || {
-    mkdir /var/www/gitlabhq/tmp
+    mkdir -p /var/www/gitlabhq/tmp
     chown gitlab:gitlab /var/www/gitlabhq/tmp
   }
+
+  test -d /var/www/gitlabhq/tmp/sockets || {
+    mkdir -p /var/www/gitlabhq/tmp/sockets
+    chown gitlab:gitlab /var/www/gitlabhq/tmp/sockets
+  }
+}
+
+gitlabhq_fixperms () {
+  local cfgfile
+  for cfgname in database.yml gitlab.yml
+  do
+    cfgfile=/var/www/gitlabhq/config/$cfgname
+    if [ -f "$cfgfile" ]
+    then
+      chown gitlab:gitlab $cfgfile
+      chmod 0600 $cfgfile
+    fi
+  done
 }
 
 gitlabhq_deploy_hooks () {
@@ -158,3 +176,4 @@ gitlabhq_deploy_hooks
 gitlabhq_configure_git
 gitlabhq_configure_gitlab
 gitlabhq_configure_database
+gitlabhq_fixperms

@@ -67,6 +67,7 @@ install-gitlabhq:
 	mkdir -p $(debroot)/gitlabhq/var/log/gitlabhq
 	mkdir -p $(debroot)/gitlabhq/var/lib/gitlabhq
 	chown 0750 $(debroot)/gitlabhq/var/lib/gitlabhq
+	$(runinstall) $(srcroot)/source/gitlabhq/config  $(debroot)/gitlabhq/var/www/gitlabhq/config
 	$(runinstall) $(srcroot)/source/gitlabhq/libexec $(debroot)/gitlabhq/usr/libexec/gitlabhq
 	$(runinstall) $(srcroot)/source/gitlabhq/.ssh    $(debroot)/gitlabhq/var/lib/gitlabhq/.ssh
 	for f in app .bundle config db doc features lib public script vendor                                      \
