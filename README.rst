@@ -15,7 +15,7 @@ The postinst script is able to configure everything, using debconf. So
 it should be a fairly straightforward process.
 
 After installing and configuring the package, provided you got
-dependencies right (namely the database and redis), you can use
+dependencies right [namely the database and redis], you can use
 gitlabhq itself to validate the deployment:
 ::
 
@@ -36,7 +36,7 @@ Binaries
 
 :gems: /var/www/gitlabhq/vendor/bin
 
-To invoke any binary (bundle, rake etc.) use:
+To invoke any binary [bundle, rake etc.] use:
 ::
 
   # the following are all the same
@@ -46,6 +46,11 @@ To invoke any binary (bundle, rake etc.) use:
 
   # to access rails console
   $ sudo -u gitlab -H /usr/libexec/gitlabhq/env rails console
+
+  # notably, mind these:
+  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env python2
+  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env ruby
+  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env gem
 
   # To use something other than production
   $ env RAILS_ENV=custom /usr/libexec/gitlabhq/env ...
@@ -57,13 +62,13 @@ This script makes sure the PATH and RAILS_ENV variables are defined:
 Available packages
 ==================
 
-* gitlabhq (v4.0)
+* gitlabhq [v4.0.0]
 
-* gitlabhq-gitolite (v3.2)
+* gitlabhq-gitolite [v3.04-42-g2d29cf7]
 
-* gitlabhq-nginx (TODO)
+* gitlabhq-nginx [TODO]
 
-* gitlabhq-apache2 (TODO)
+* gitlabhq-apache2 [TODO]
 
 Configuration Files
 ===================
