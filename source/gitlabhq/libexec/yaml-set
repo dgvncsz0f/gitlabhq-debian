@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/ruby1.9.1
 # coding: utf-8
 
 require "yaml"
@@ -7,15 +7,26 @@ mem = YAML.load_file(ARGV[0])
 tmp = mem
 key = ARGV[-2]
 val = ARGV[-1]
-ARGV[1..-3].each {|k| tmp = tmp[k] || {}}
+ARGV[1..-3].each do |k|
+  if (! tmp.has_key?(k))
+    tmp[k] = {}
+  end
+  tmp = tmp[k]
+end
 
-if (val.start_with?("="))
-  tmp[key] = val[1..-1]
-elsif (val.start_with?("+"))
+if (val.end_with?(":string"))
+  tmp[key] = val[0..-8]
+elsif (val.end_with?(":integer"))
+  tmp[key] = val[0..-9].to_i
+elsif (val.end_with?(":boolean"))
+  tmp[key] = "true" == val[0..-9]
+elsif (val.end_with?(":list"))
   if (! tmp[key].is_a?([]))
     tmp[key] = []
   end
-  tmp[key] << val[1..-1]
+  tmp[key] << val[0..-6]
+elsif (val == ":delete")
+  tmp.delete(key)
 end
 
 File.open(ARGV[0], "w") {|fh| YAML.dump(mem, fh)}

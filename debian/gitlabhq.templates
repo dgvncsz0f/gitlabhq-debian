@@ -1,30 +1,69 @@
-Template: gitlabhq/gitlab/hostname
+Template: gitlabhq/gitlab/gitlab/hostname
 Type: string
 Default: localhost
 Description: Webserver hostname
-  The host name the web server is using to serve gitlab
+ The host name the web server is using to serve gitlab. Make sure
+ this match the configuration of your webserver.
 
-Template: gitlabhq/gitlab/port
+Template: gitlabhq/gitlab/gitlab/port
 Type: string
 Default: 80
 Description: Werbserver port number
-  The port number the web server is using to serve gitlab
+ The port number the web server is using to serve gitlab. Make sure
+ this match the configuration of your webserver.
 
-Template: gitlabhq/gitlab/https
+Template: gitlabhq/gitlab/gitlab/https
 Type: boolean
 Default: false
 Description: Enable HTTP?
-  Set this to true if you plan to require SSL to access to the
-  web interface.
+ Set this to true if you plan to require SSL to access to the web
+ interface. Make sure this match the configuration of your webserver.
 
-Template: gitlabhq/gitlab/gravatar
+Template: gitlabhq/gitlab/gravatar/enabled
 Type: boolean
 Default: true
 Description: Enable gravatar?
-  Gravatar is an online service to manage user avatars. For more
-  information, refer to http://gravatar.com/
+ Gravatar is an online service to manage user avatars. Use true if you
+ are unsure.
 
-Template: gitlabhq/gitlab/email
+Template: gitlabhq/gitlab/gitlab/email_from
 Type: string
 Default: gitlab@localhost
-Description: Email address used in the "From" field in mails sent by GitLab
+Description: Email address
+ This defines the username gitlab will use in the From field. It is
+ also used in the gitconfig file (user.email entry)
+
+Template: gitlabhq/database/driver
+Type: select
+Choices: mysql, postgresql
+Default: mysql
+Description: Which database driver you want to use?
+
+Template: gitlabhq/database/name
+Type: string
+Default: gitlabhq_production
+Description: The database name
+
+Template: gitlabhq/database/username
+Type: string
+Default: gitlabhq
+Description: The username to connect to the database
+
+Template: gitlabhq/database/password
+Type: password
+Description: The password to connect to the database
+
+Template: gitlabhq/database/pool
+Type: string
+Default: 5
+Description: Connection pool size
+ Connection pool may greatly improve performance at the cost of
+ higher resources consumption
+
+Template: gitlabhq/database/host
+Type: string
+Default: localhost
+Description: The hostname or unix socket to connect to the database
+ If this starts with a / (slash), it will be used as a unix
+ socket. For instance, `localhost:3306' or `localhost' are both
+ hostnames, whereas /tmp/database.xsock is a unix socket

@@ -13,6 +13,6 @@ Description: Patched for GitLab | Hosting git repositories -- Gitolite allows yo
 
 Package: gitlabhq
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, gitlabhq-gitolite (>= 3.2), ruby1.9.1, libmysqlclient16, libpq5, libicu44, debconf
+Depends: ${shlibs:Depends}, ${misc:Depends}, gitlabhq-gitolite (>= 3.2), ruby1.9.1, libmysqlclient16, libpq5, libicu44, debconf, dash
 Description: Self hosted Git management software
 

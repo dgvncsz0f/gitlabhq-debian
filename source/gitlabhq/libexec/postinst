@@ -2,8 +2,12 @@
 
 set -e
 
+. /usr/share/debconf/confmodule
+
 githome=/var/lib/gitlabhq-gitolite
 glhome=/var/lib/gitlabhq
+
+bin_yamlset=/usr/libexec/gitlabhq/yaml-set
 
 adduser --system               \
         --shell /bin/sh        \
@@ -20,30 +24,137 @@ usermod -G git gitlab
 chown gitlab /var/log/gitlabhq
 chown gitlab:gitlab $glhome
 
-test -f $glhome/.ssh/id_rsa || {
-  ssh-keygen -q -N "" -t rsa -f $glhome/.ssh/id_rsa
-  chown -R gitlab:gitlab $glhome/.ssh
-  chmod 0700 $glhome/.ssh
-  chmod 0400 $glhome/.ssh/id_rsa
-  chmod 0444 $glhome/.ssh/id_rsa.pub
+gitlabhq_deploy_keys () {
+  test -f $glhome/.ssh/id_rsa || {
+    ssh-keygen -q -N "" -t rsa -f $glhome/.ssh/id_rsa
+    chown -R gitlab:gitlab $glhome/.ssh
+    chmod 0700 $glhome/.ssh
+    chmod 0400 $glhome/.ssh/id_rsa
+    chmod 0444 $glhome/.ssh/id_rsa.pub
 
-  cp $glhome/.ssh/id_rsa.pub $githome/gitlab.pub
-  su - -c "gitolite setup -pk $githome/gitlab.pub" git 1>&2
+    cp $glhome/.ssh/id_rsa.pub $githome/gitlab.pub
+    su - -c "gitolite setup -pk $githome/gitlab.pub" git 1>&2
+  }
 }
 
-test -f $glhome/.gitconfig || {
-  su - -c "git config --global user.name GitLab" gitlab
-  su - -c "git config --global user.email gitlab@localhost.localdomain" gitlab
+gitlabhq_mkdirs () {
+  test -h /var/www/gitlabhq/log || {
+    ln -s /var/log/gitlabhq /var/www/gitlabhq/log
+  }
+
+  test -d /var/www/gitlabhq/tmp || {
+    mkdir /var/www/gitlabhq/tmp
+    chown gitlab:gitlab /var/www/gitlabhq/tmp
+  }
 }
 
-test -h /var/www/gitlabhq/log || {
-  ln -s /var/log/gitlabhq /var/www/gitlabhq/log
+gitlabhq_deploy_hooks () {
+  cp /var/www/gitlabhq/lib/hooks/post-receive $githome/.gitolite/hooks/common/post-receive
+  chown git:git $githome/.gitolite/hooks/common/post-receive
 }
 
-test -d /var/www/gitlabhq/tmp || {
-  mkdir /var/www/gitlabhq/tmp
-  chown gitlab:gitlab /var/www/gitlabhq/tmp
+gitlabhq_configure_gitlab () {
+  test -f /var/www/gitlabhq/config/gitlab.yml || cp /var/www/gitlabhq/config/gitlab.yml.example /var/www/gitlabhq/config/gitlab.yml
+
+  if db_get gitlabhq/gitlab/gitlab/hostname
+  then
+    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitlab host "$RET":string
+  fi
+  
+  if db_get gitlabhq/gitlab/gitlab/port
+  then
+    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitlab port "$RET":integer
+  fi
+
+  if db_get gitlabhq/gitlab/gitlab/https
+  then
+    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitlab https "$RET":boolean
+  fi
+
+  if db_get gitlabhq/gitlab/gitlab/email_from
+  then
+    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitlab email_from "$RET":string
+  fi
+
+  if db_get gitlabhq/gitlab/gravatar/enabled
+  then
+    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gravatar enabled "$RET":boolean
+  fi
+
+  $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitolite repos_path $githome/repositories:string
+  $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitolite hooks_path $githome/.gitolite/hooks:string
 }
 
-cp /var/www/gitlabhq/lib/hooks/post-receive $githome/.gitolite/hooks/common/post-receive
-chown git:git $githome/.gitolite/hooks/common/post-receive
+gitlabhq_configure_database () {
+  local host port dport
+  test -f /var/www/gitlabhq/config/database.yml || cp /var/www/gitlabhq/config/database.yml.mysql /var/www/gitlabhq/config/database.yml
+
+  if db_get gitlabhq/database/driver
+  then
+    if [ "$RET" = "mysql" ]
+    then
+      $bin_yamlset /var/www/gitlabhq/config/database.yml production adapter mysql2:string
+      dport=3306
+    elif [ "$RET" = "postgresql" ]
+    then
+      dport=5432
+      $bin_yamlset /var/www/gitlabhq/config/database.yml production adapter postgresql:string
+    fi
+  fi
+
+  if db_get gitlabhq/database/name
+  then
+    $bin_yamlset /var/www/gitlabhq/config/database.yml production database "$RET":string
+  fi
+
+  if db_get gitlabhq/database/pool
+  then
+    $bin_yamlset /var/www/gitlabhq/config/database.yml production pool "$RET":integer
+  fi
+
+  if db_get gitlabhq/database/username
+  then
+    $bin_yamlset /var/www/gitlabhq/config/database.yml production username "$RET":string
+  fi
+
+  if db_get gitlabhq/database/password
+  then
+    $bin_yamlset /var/www/gitlabhq/config/database.yml production password "$RET":string
+  fi
+
+  if db_get gitlabhq/database/host
+  then
+    if expr "$RET" : "^/" >/dev/null
+    then
+      $bin_yamlset /var/www/gitlabhq/config/database.yml production socket "$RET":string
+      $bin_yamlset /var/www/gitlabhq/config/database.yml production host :delete
+      $bin_yamlset /var/www/gitlabhq/config/database.yml production port :delete
+    else
+      host=$(echo "$RET" | cut -d: -f1)
+      port=$(echo "$RET" | cut -d: -f2)
+      $bin_yamlset /var/www/gitlabhq/config/database.yml production socket :delete
+      $bin_yamlset /var/www/gitlabhq/config/database.yml production host "$host":string
+      if [ "$port" = "$host" -o -z "$port" ]
+      then
+        $bin_yamlset /var/www/gitlabhq/config/database.yml production port "$dport":integer
+      else
+        $bin_yamlset /var/www/gitlabhq/config/database.yml production port "$port":integer
+      fi
+    fi
+  fi
+}
+
+gitlabhq_configure_git () {
+  if db_get gitlabhq/gitlab/gitlab/email_from
+  then
+    su - -c "git config --global user.name GitLab" gitlab
+    su - -c "git config --global user.email \"$RET\"" gitlab
+  fi
+}
+
+gitlabhq_mkdirs
+gitlabhq_deploy_keys
+gitlabhq_deploy_hooks
+gitlabhq_configure_git
+gitlabhq_configure_gitlab
+gitlabhq_configure_database

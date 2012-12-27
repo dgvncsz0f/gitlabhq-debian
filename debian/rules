@@ -14,7 +14,7 @@ runinstall   = $(bin_env) bin_find=$(bin_find)       \
                           bin_install=$(bin_install) \
                           $(srcroot)/source/install.sh
 
-clean::
+clean:
 	dh_testdir
 	dh_testroot
 	rm -r -f $(tmproot) build-gitlabhq install-gitlabhq install-gitolite
@@ -84,6 +84,7 @@ binary: binary-indep binary-arch
 	dh_compress
 	dh_fixperms
 	dh_installdeb
+	dh_installdebconf
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
