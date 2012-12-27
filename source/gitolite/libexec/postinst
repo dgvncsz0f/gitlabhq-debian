@@ -15,12 +15,7 @@ adduser --system                      \
         git
 
 chown git /var/log/gitlabhq-gitolite
-
-test -d $githome || {
-  mkdir $githome
-  chown git:git $githome
-  chmod 0750 $githome
-}
+chown git:git $githome
 
 test -d $githome/repositories || {
   mkdir $githome/repositories

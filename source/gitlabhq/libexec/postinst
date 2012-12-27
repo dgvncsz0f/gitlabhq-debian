@@ -3,6 +3,7 @@
 set -e
 
 githome=/var/lib/gitlabhq-gitolite
+glhome=/var/lib/gitlabhq
 
 adduser --system               \
         --shell /bin/sh        \
@@ -11,40 +12,27 @@ adduser --system               \
         --group                \
         --no-create-home       \
         --disabled-login       \
-        --home /home/gitlab    \
+        --home $glhome         \
         gitlab
 
 usermod -G git gitlab
 
 chown gitlab /var/log/gitlabhq
+chown gitlab:gitlab $glhome
 
-test -d /home/gitlab || {
-  mkdir /home/gitlab
-  chown gitlab:gitlab /home/gitlab
-  chmod 0750 /home/gitlab
-}
+test -f $glhome/.ssh/id_rsa || {
+  mkdir $glhome/.ssh
+  ssh-keygen -q -N "" -t rsa -f $glhome/.ssh/id_rsa
+  chown -R gitlab:gitlab $glhome/.ssh
+  chmod 0700 $glhome/.ssh
+  chmod 0400 $glhome/.ssh/id_rsa
+  chmod 0444 $glhome/.ssh/id_rsa.pub
 
-test -d /home/gitlab/.ssh || {
-  mkdir /home/gitlab/.ssh
-  ssh-keygen -q -N "" -t rsa -f /home/gitlab/.ssh/id_rsa
-  chown -R gitlab:gitlab /home/gitlab/.ssh
-  chmod 0700 /home/gitlab/.ssh
-  chmod 0400 /home/gitlab/.ssh/id_rsa
-  chmod 0444 /home/gitlab/.ssh/id_rsa.pub
-
-  cp /home/gitlab/.ssh/id_rsa.pub $githome/gitlab.pub
+  cp $glhome/.ssh/id_rsa.pub $githome/gitlab.pub
   su - -c "gitolite setup -pk $githome/gitlab.pub" git 1>&2
 }
 
-test -f /home/gitlab/.ssh/config || {
-  echo "Host *"                          >/home/gitlab/.ssh/config
-  echo "  StrictHostKeyChecking no"     >>/home/gitlab/.ssh/config
-  echo "  UserKnownHostsFile=/dev/null" >>/home/gitlab/.ssh/config
-
-  chown gitlab:gitlab /home/gitlab/.ssh/config
-}
-
-test -f /home/gitlab/.gitconfig || {
+test -f $glhome/.gitconfig || {
   su - -c "git config --global user.name GitLab" gitlab
   su - -c "git config --global user.email gitlab@localhost.localdomain" gitlab
 }
