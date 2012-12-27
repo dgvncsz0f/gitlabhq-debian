@@ -22,8 +22,9 @@ test -d /home/gitlab || {
 
 test -d /home/gitlab/.ssh || {
   mkdir /home/gitlab/.ssh
-  chmod 0700 /home/gitlab/.ssh
   ssh-keygen -q -N "" -t rsa -f /home/gitlab/.ssh/id_rsa
+  chown -R gitlab:gitlab /home/gitlab/.ssh
+  chmod 0700 /home/gitlab/.ssh
   chmod 0400 /home/gitlab/.ssh/id_rsa
   chmod 0444 /home/gitlab/.ssh/id_rsa.pub
 
@@ -35,6 +36,8 @@ test -f /home/gitlab/.ssh/config || {
   echo "Host *"                          >/home/gitlab/.ssh/config
   echo "  StrictHostChecking no"        >>/home/gitlab/.ssh/config
   echo "  UserKnownHostsFile=/dev/null" >>/home/gitlab/.ssh/config
+
+  chown gitlab:gitlab /home/gitlab/.ssh/config
 }
 
 test -f /home/gitlab/.gitconfig || {
