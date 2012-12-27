@@ -13,6 +13,10 @@ adduser --system               \
         gitlab
 
 usermod -G git gitlab
+chown gitlab /var/log/gitlabhq
+
+cp /var/www/gitlabhq/lib/hooks/post-receive /var/lib/git/.gitolite/hooks/common/post-receive
+chown git:git /var/lib/git/.gitolite/hooks/common/post-receive
 
 test -d /home/gitlab || {
   mkdir /home/gitlab
@@ -34,7 +38,7 @@ test -d /home/gitlab/.ssh || {
 
 test -f /home/gitlab/.ssh/config || {
   echo "Host *"                          >/home/gitlab/.ssh/config
-  echo "  StrictHostChecking no"        >>/home/gitlab/.ssh/config
+  echo "  StrictHostKeyChecking no"     >>/home/gitlab/.ssh/config
   echo "  UserKnownHostsFile=/dev/null" >>/home/gitlab/.ssh/config
 
   chown gitlab:gitlab /home/gitlab/.ssh/config
@@ -43,4 +47,13 @@ test -f /home/gitlab/.ssh/config || {
 test -f /home/gitlab/.gitconfig || {
   su - -c "git config --global user.name GitLab" gitlab
   su - -c "git config --global user.email gitlab@localhost.localdomain" gitlab
+}
+
+test -h /var/www/gitlabhq/log || {
+  ln -s /var/log/gitlabhq /var/log/www/gitlabhq/log
+}
+
+test -d /var/www/gitlabhq/tmp || {
+  mkdir /var/www/gitlabhq/tmp
+  chown gitlab:gitlab /var/www/gitlabhq/tmp
 }

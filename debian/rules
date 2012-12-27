@@ -54,14 +54,15 @@ pre-install:
 	dh_installdirs
 
 install-gitolite:
-	$(runinstall) $(srcroot)/source/gitolite.git/src $(debroot)/gitlabhq-gitolite/usr/share/gitlabhq-gitolite
-	$(runinstall) $(srcroot)/source/gitolite-scripts $(debroot)/gitlabhq-gitolite/usr/libexec/gitlabhq-gitolite
 	mkdir -p $(debroot)/gitlabhq-gitolite/var/log/gitlabhq-gitolite
 	mkdir -p $(debroot)/gitlabhq-gitolite/usr/bin
+	$(runinstall) $(srcroot)/source/gitolite.git/src $(debroot)/gitlabhq-gitolite/usr/share/gitlabhq-gitolite
+	$(runinstall) $(srcroot)/source/gitolite-scripts $(debroot)/gitlabhq-gitolite/usr/libexec/gitlabhq-gitolite
 	ln -s ../share/gitlabhq-gitolite/gitolite $(debroot)/gitlabhq-gitolite/usr/bin/gitolite
 	touch install-gitolite
 
 install-gitlabhq:
+	mkdir -p $(debroot)/gitlabhq/var/log/gitlabhq
 	for f in app .bundle config db doc features lib public script vendor                                      \
                  config.ru Gemfile Gemfile.lock Rakefile;                                                         \
         do                                                                                                        \
