@@ -14,6 +14,13 @@ dependency, it only required `ruby1.9.1`.
 The postinst script is able to configure everything, using debconf. So
 it should be a fairly straightforward process.
 
+After installing and configuring the package, provided you got
+dependencies right (namely the database and redis), you can use
+gitlabhq itself to validate the deployment:
+::
+
+  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env rake gitlab:check
+
 Changes from official installer
 ===============================
 
@@ -87,8 +94,7 @@ You may also do this without an interactive interface:
   $ debconf-set-selections -c gitlabhq.config && \
       debconf-set-selections gitlabhq.config
 
-N.B.: Only use this command to seed debconf values for packages that
-      will be or are installed [man debconf-set-selections].
+N.B.: Only use this command to seed debconf values for packages that will be or are installed [man debconf-set-selections].
 
 If you do this prior installing the package the config files will
 configures properly. If you do this a later time, make sure to invoke
