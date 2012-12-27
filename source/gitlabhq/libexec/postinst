@@ -21,7 +21,6 @@ chown gitlab /var/log/gitlabhq
 chown gitlab:gitlab $glhome
 
 test -f $glhome/.ssh/id_rsa || {
-  mkdir $glhome/.ssh
   ssh-keygen -q -N "" -t rsa -f $glhome/.ssh/id_rsa
   chown -R gitlab:gitlab $glhome/.ssh
   chmod 0700 $glhome/.ssh
