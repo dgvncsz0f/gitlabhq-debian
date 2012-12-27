@@ -19,6 +19,7 @@ dependencies right [namely the database and redis], you can use
 gitlabhq itself to validate the deployment:
 ::
 
+  $ cd /var/www/gitlabhq
   $ sudo -u gitlab -H /usr/libexec/gitlabhq/env rake gitlab:check
 
 Changes from official installer
