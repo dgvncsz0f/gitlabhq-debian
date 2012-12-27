@@ -56,6 +56,7 @@ pre-install:
 install-gitolite:
 	$(runinstall) $(srcroot)/source/gitolite.git/src $(debroot)/gitlabhq-gitolite/usr/share/gitlabhq-gitolite
 	$(runinstall) $(srcroot)/source/gitolite-scripts $(debroot)/gitlabhq-gitolite/usr/libexec/gitlabhq-gitolite
+	mkdir -p $(debroot)/gitlabhq-gitolite/var/log/gitlabhq-gitolite
 	mkdir -p $(debroot)/gitlabhq-gitolite/usr/bin
 	ln -s ../share/gitlabhq-gitolite/gitolite $(debroot)/gitlabhq-gitolite/usr/bin/gitolite
 	touch install-gitolite

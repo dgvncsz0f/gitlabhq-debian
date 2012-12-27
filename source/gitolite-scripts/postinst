@@ -12,6 +12,8 @@ adduser --system                      \
         --home /var/lib/git           \
         git
 
+chown git /var/log/gitlabhq-gitolite
+
 test -d /var/lib/git || {
   mkdir /var/lib/git
   chown git:git /var/lib/git
@@ -26,7 +28,7 @@ test -d /var/lib/git/repositories || {
 
 test -d /var/lib/git/.gitolite || {
   mkdir /var/lib/git/.gitolite
-  mkdir /var/lib/git/.gitolite/logs
+  ln -s /var/log/gitlabhq-gitolite /var/lib/git/.gitolite/logs
   chown -R git:git /var/lib/git/.gitolite
   chmod -R 750 /var/lib/git/.gitolite
 }
