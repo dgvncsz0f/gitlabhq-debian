@@ -4,6 +4,7 @@
 
 :todo: Database setup:
        https://github.com/gitlabhq/gitlabhq/blob/stable/doc/install/databases.md;
+:todo: debconf to handle/configure authentication;
 :todo: App initialization: rake gitlab:app:setup RAILS_ENV=production;
 :todo: Create an init script;
 
