@@ -22,17 +22,15 @@ clean:
 	rm -r -f $(tmproot) build-gitlabhq install-gitlabhq install-gitolite
 	dh_clean
 
-build: pre-build build-arch build-indep
+build: build-arch build-indep
 
 build-arch: build-gitlabhq
 
 build-indep: build-gitolite
 
-pre-build:
+build-gitlabhq:
 	dh_testdir
 	mkdir -p $(tmproot)
-
-build-gitlabhq:
 	cp -r $(srcroot)/source/gitlabhq.git $(tmproot)/gitlabhq.git
 	$(bin_gem) install --install-dir $(tmproot)/gitlabhq.git/vendor/0 \
                            --bindir $(tmproot)/gitlabhq.git/vendor/bin    \
@@ -46,6 +44,7 @@ build-gitlabhq:
 	touch build-gitlabhq
 
 build-gitolite:
+	dh_testdir
 
 install: pre-install install-gitolite install-gitlabhq
 
@@ -92,6 +91,7 @@ binary: binary-indep binary-arch
 	dh_fixperms
 	dh_installdeb
 	dh_installdebconf
+	dh_installinit
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
@@ -101,6 +101,6 @@ binary-arch: build install
 binary-indep: build install
 
 get-orig-source:
-	$(bin_git) submodule init && $(bin_git) submodule update;
+	$(bin_git) submodule init && $(bin_git) submodule update
 
 .PHONY: clean build build-arch build-indep binary binary-arch binary-indep install
