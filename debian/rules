@@ -41,7 +41,7 @@ build-gitlabhq:
                            --no-rdoc                                      \
                            --no-ri bundler
 	$(runinstall) $(srcroot)/source/gitlabhq/config  $(tmproot)/gitlabhq.git/config
-	$(runinstall) $(srcroot)/source/gitlabhq/bin     $(debroot)/gitlabhq/var/www/gitlabhq/vendor/bin
+	$(runinstall) $(srcroot)/source/gitlabhq/bin     $(debroot)/gitlabhq.git/vendor/bin
 	(cd $(tmproot)/gitlabhq.git && $(runbundle) install       \
                                          --binstubs=./vendor/bin  \
                                          --deployment             \
