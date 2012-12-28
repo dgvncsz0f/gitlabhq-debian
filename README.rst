@@ -14,7 +14,7 @@ other words, the package will compile nothing in production. I
 consider this a big win over the official installing script.
 
 This package is pretty much self-contained. Disregarding the database
-dependency, it only required `ruby1.9.1`.
+dependency, it only requires `ruby1.9.1`.
 
 The postinst script is able to configure everything, using debconf. So
 it should be a fairly straightforward process.
@@ -24,67 +24,62 @@ dependencies right [namely the database and redis], you can use
 gitlabhq itself to validate the deployment:
 ::
 
-  $ cd /var/www/gitlabhq
-  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env rake gitlab:check
+  $ su - gitlab -c "cd /var/www/gitlabhq; /usr/libexec/gitlabhq/env rake gitlab:check"
 
-Changes from official installer
-===============================
+Installing
+==========
+::
 
-Home dirs
----------
+  # todo: need to provide a source repo for this to work
+  $ apt-get install gitlabhq-gitolite gitolite
+  $ dpkg-reconfigure gitlabhq
+
+  # initialize the application
+  $ su - gitlab -c "cd /var/www/gitlabhq; /usr/libexec/gitlabhq/env rake gitlab:app:setup"
+
+  # verify everything is Ok
+  $ su - gitlab -c "cd /var/www/gitlabhq; /usr/libexec/gitlabhq/env rake gitlab:check"
+
+  # yay!
+  $ /etc/init.d/gitlabhq start
+
+Layout
+======
+
+Users
+-----
+
+:gitlab: gitlab
+:gitolite: git
+
+Home Directories
+----------------
 
 :gitlab: /var/lib/gitlabhq
 :gitolite: /var/lib/gitlabhq-gitolite
+
+Applications
+------------
+
 :rails: /var/www/gitlabhq
+:logs: /var/log/gitlabhq, /var/log/gitlabhq-gitolite
+:gitolite repos: /var/lib/gitlabhq-gitolite/repositories
 
 Binaries
 --------
 
 :gems: /var/www/gitlabhq/vendor/bin
+:scripts: /usr/libexec/gitlabhq, /usr/libexec/gitlabhq-gitolite
 
-To invoke any binary [bundle, rake etc.] use:
-::
+Configuring
+===========
 
-  # the following are all the same
-  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env rake gitlab:env:info
-  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info
-  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info RAILS_ENV=production
+The package makes heavy use of `debconf` in order to make it easier to
+install. Based on the answers you provide, the configuration scripts
+will be changed. Notice you are still allowed to edit files manually,
+just keep in mind that it may overwrite things you have done.
 
-  # to access rails console
-  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env rails console
-
-  # notably, mind these:
-  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env python2
-  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env ruby
-  $ sudo -u gitlab -H /usr/libexec/gitlabhq/env gem
-
-  # To use something other than production
-  $ env RAILS_ENV=custom /usr/libexec/gitlabhq/env ...
-
-This script makes sure the PATH and RAILS_ENV variables are defined:
-
-* https://github.com/dgvncsz0f/gitlabhq-debian/blob/master/source/gitlabhq/libexec/env
-
-Available packages
-==================
-
-* gitlabhq [v4.0.0]
-
-* gitlabhq-gitolite [v3.04-42-g2d29cf7]
-
-* gitlabhq-nginx [TODO]
-
-* gitlabhq-apache2 [TODO]
-
-Configuration Files
-===================
-
-Use dpkg:
-::
-
-  $ dpkg-reconfigure gitlabhq
-
-This will effectively change the following files:
+The following files are automatically managed:
 
 * /var/www/gitlabhq/config/gitlab.yml
 
@@ -92,7 +87,10 @@ This will effectively change the following files:
 
 * /var/lib/gitlabhq/.gitconfig
 
-You may also do this without an interactive interface:
+The changes you make using `dpkg-reconfigure` are applied
+automatically.
+
+You may also do this without the interactive interface:
 ::
 
   # retrieve all config options
@@ -105,11 +103,39 @@ You may also do this without an interactive interface:
   $ debconf-set-selections -c gitlabhq.config && \
       debconf-set-selections gitlabhq.config
 
-N.B.: Only use this command to seed debconf values for packages that will be or are installed [man debconf-set-selections].
+N.B.: Only use this command to seed debconf values for packages that
+will be or are installed [man debconf-set-selections].
 
-If you do this prior installing the package the config files will
-configures properly. If you do this a later time, make sure to invoke
-`dpkg-reconfigure -u gitlabhq` to apply changes.
+Gotchas
+=======
+
+The package bundles everything, including bundler. For this reason,
+you have to change some environment variables, most notably
+`GEM_HOME`. There is a script that does just this, and you are
+advisable to use it to invoke any command that depend on bundler or
+the gems managed by it:
+
+* /usr/libexec/gitlabhq/env
+
+To use it, simply prefix the command you want with that script, as
+follows:
+::
+
+  # the following are all the same
+  $ /usr/libexec/gitlabhq/env rake gitlab:env:info
+  $ /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info
+  $ /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info RAILS_ENV=production
+
+  # to access rails console
+  $ /usr/libexec/gitlabhq/env rails console
+
+  # notably, mind these:
+  $ /usr/libexec/gitlabhq/env python2
+  $ /usr/libexec/gitlabhq/env ruby
+  $ /usr/libexec/gitlabhq/env gem
+
+  # To use something other than production
+  $ env RAILS_ENV=custom /usr/libexec/gitlabhq/env ...
 
 Building
 ========
@@ -132,5 +158,3 @@ It takes only three steps:
 ::
 
   $ dpkg-buildpackage # -uc -us
-
-You now should have all packages built.
