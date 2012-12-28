@@ -156,7 +156,10 @@ gitlabhq_configure_git () {
 gitlabhq_assets_precompile () {
   if db_get gitlabhq/run_assets_precompile
   then
-    su - -c "{ cd /var/www/gitlabhq && /usr/libexec/gitlabhq/env rake assets:precompile; } || true" gitlab 1>&2
+    if [ "$RET" = true ]
+    then
+      su - -c "{ cd /var/www/gitlabhq && /usr/libexec/gitlabhq/env rake assets:precompile; } || true" gitlab 1>&2
+    fi
   fi
 }
 
