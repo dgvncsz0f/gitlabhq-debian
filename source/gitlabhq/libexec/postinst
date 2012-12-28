@@ -9,8 +9,6 @@ glhome=/var/lib/gitlabhq
 
 bin_yamlset=/usr/libexec/gitlabhq/yaml-set
 
-chown gitlab:gitlab $glhome
-
 adduser --system               \
         --shell /bin/sh        \
         --gecos "GitLab"       \
@@ -22,6 +20,8 @@ adduser --system               \
         gitlab
 
 usermod -G git gitlab
+
+chown gitlab:gitlab $glhome
 
 gitlabhq_deploy_keys () {
   test -f $glhome/.ssh/id_rsa || {
