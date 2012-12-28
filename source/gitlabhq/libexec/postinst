@@ -9,6 +9,8 @@ glhome=/var/lib/gitlabhq
 
 bin_yamlset=/usr/libexec/gitlabhq/yaml-set
 
+chown gitlab:gitlab $glhome
+
 adduser --system               \
         --shell /bin/sh        \
         --gecos "GitLab"       \
@@ -20,9 +22,6 @@ adduser --system               \
         gitlab
 
 usermod -G git gitlab
-
-chown gitlab /var/log/gitlabhq
-chown gitlab:gitlab $glhome
 
 gitlabhq_deploy_keys () {
   test -f $glhome/.ssh/id_rsa || {
@@ -38,31 +37,28 @@ gitlabhq_deploy_keys () {
 }
 
 gitlabhq_mkdirs () {
-  test -h /var/www/gitlabhq/log || {
-    ln -s /var/log/gitlabhq /var/www/gitlabhq/log
-  }
-
-  test -d /var/www/gitlabhq/tmp || {
-    mkdir -p /var/www/gitlabhq/tmp
-    chown gitlab:gitlab /var/www/gitlabhq/tmp
-  }
-
-  test -d /var/www/gitlabhq/tmp/sockets || {
-    mkdir -p /var/www/gitlabhq/tmp/sockets
-    chown gitlab:gitlab /var/www/gitlabhq/tmp/sockets
-  }
+  test -h /var/www/gitlabhq/log || ln -s /var/log/gitlabhq /var/www/gitlabhq/log
+  test -d /var/www/gitlabhq/tmp || mkdir -p /var/www/gitlabhq/tmp
+  test -d /var/www/gitlabhq/tmp/sockets || mkdir -p /var/www/gitlabhq/tmp/sockets
+  test -d /var/www/gitlabhq/tmp/cache || mkdir -p /var/www/gitlabhq/tmp/cache
 }
 
 gitlabhq_fixperms () {
-  local cfgfile
-  for cfgname in database.yml gitlab.yml
+  chown gitlab /var/log/gitlabhq
+
+  for name in database.yml gitlab.yml
   do
-    cfgfile=/var/www/gitlabhq/config/$cfgname
+    cfgfile=/var/www/gitlabhq/config/$name
     if [ -f "$cfgfile" ]
     then
       chown gitlab:gitlab $cfgfile
       chmod 0600 $cfgfile
     fi
+  done
+  
+  for name in tmp public
+  do
+    chown -R gitlab:gitlab /var/www/gitlabhq/$name
   done
 }
 
@@ -157,6 +153,13 @@ gitlabhq_configure_git () {
   fi
 }
 
+gitlabhq_assets_precompile () {
+  if db_get gitlabhq/run_assets_precompile
+  then
+    su - -c "{ cd /var/www/gitlabhq && /usr/libexec/gitlabhq/env rake assets:precompile; } || true" gitlab 1>&2
+  fi
+}
+
 gitlabhq_mkdirs
 gitlabhq_deploy_keys
 gitlabhq_deploy_hooks
@@ -164,3 +167,4 @@ gitlabhq_configure_git
 gitlabhq_configure_gitlab
 gitlabhq_configure_database
 gitlabhq_fixperms
+gitlabhq_assets_precompile

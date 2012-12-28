@@ -15,6 +15,9 @@ getversion   = $(bin_env) GIT_DIR=$(srcroot)/source/gitolite.git/.git \
 runinstall   = $(bin_env) bin_find=$(bin_find)       \
                           bin_install=$(bin_install) \
                           $(srcroot)/source/install.sh
+runbundle    = $(bin_env) RAILS_ENV=production \
+                          GEM_HOME=./vendor/0  \
+                          ./vendor/bin/bundle
 
 clean:
 	dh_testdir
@@ -37,9 +40,11 @@ build-gitlabhq:
                            --no-user-install                              \
                            --no-rdoc                                      \
                            --no-ri bundler
-	(cd $(tmproot)/gitlabhq.git && $(bin_env) GEM_HOME=./vendor/0 \
-             ./vendor/bin/bundle install --binstubs=./vendor/bin      \
-                                         --deployment                 \
+	$(runinstall) $(srcroot)/source/gitlabhq/config  $(tmproot)/gitlabhq.git/config
+	$(runinstall) $(srcroot)/source/gitlabhq/bin     $(debroot)/gitlabhq/var/www/gitlabhq/vendor/bin
+	(cd $(tmproot)/gitlabhq.git && $(runbundle) install       \
+                                         --binstubs=./vendor/bin  \
+                                         --deployment             \
                                          --without development test)
 	touch build-gitlabhq
 
@@ -71,10 +76,8 @@ install-gitlabhq:
 	mkdir -p $(debroot)/gitlabhq/var/log/gitlabhq
 	mkdir -p $(debroot)/gitlabhq/var/lib/gitlabhq
 	chown 0750 $(debroot)/gitlabhq/var/lib/gitlabhq
-	$(runinstall) $(srcroot)/source/gitlabhq/config  $(debroot)/gitlabhq/var/www/gitlabhq/config
 	$(runinstall) $(srcroot)/source/gitlabhq/libexec $(debroot)/gitlabhq/usr/libexec/gitlabhq
 	$(runinstall) $(srcroot)/source/gitlabhq/.ssh    $(debroot)/gitlabhq/var/lib/gitlabhq/.ssh
-	$(runinstall) $(srcroot)/source/gitlabhq/bin     $(debroot)/gitlabhq/var/www/gitlabhq/vendor/bin
 	for f in app .bundle config db doc features lib public script vendor                                      \
                  config.ru Gemfile Gemfile.lock Rakefile VERSION;                                                 \
         do                                                                                                        \

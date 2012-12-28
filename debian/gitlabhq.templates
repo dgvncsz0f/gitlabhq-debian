@@ -123,3 +123,11 @@ Default: uid
 Description: The LDAP attribute name for the user name in the login form
  Typically AD would be `sAMAccountName' or `UserPrincipalName', while
  OpenLDAP is `uid'
+
+Template: gitlabhq/run_assets_precompile
+Type: boolean
+Default: true
+Description: Invoke rake assets:precompile automatically?
+ Assets precompile improve performance of your web application. If you
+ decide to no run this, make sure to invoke `rake assets:precompile'
+ before starting the application
