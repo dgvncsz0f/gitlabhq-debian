@@ -31,10 +31,6 @@ build-indep: build-gitolite
 pre-build:
 	dh_testdir
 	mkdir -p $(tmproot)
-	if [ -d $(srcroot)/.git ];                                   \
-        then                                                         \
-          $(bin_git) submodule init && $(bin_git) submodule update;  \
-        fi
 
 build-gitlabhq:
 	cp -r $(srcroot)/source/gitlabhq.git $(tmproot)/gitlabhq.git
@@ -103,5 +99,8 @@ binary: binary-indep binary-arch
 binary-arch: build install
 
 binary-indep: build install
+
+get-orig-source:
+	$(bin_git) submodule init && $(bin_git) submodule update;
 
 .PHONY: clean build build-arch build-indep binary binary-arch binary-indep install
