@@ -72,94 +72,81 @@ gitlabhq_deploy_hooks () {
 }
 
 gitlabhq_configure_gitlab () {
-  test -f /var/www/gitlabhq/config/gitlab.yml || cp /var/www/gitlabhq/config/gitlab.yml.example /var/www/gitlabhq/config/gitlab.yml
+  local host port tmp group key type ymlfile
+  ymlfile=/var/www/gitlabhq/config/gitlab.yml
 
-  if db_get gitlabhq/gitlab/gitlab/hostname
-  then
-    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitlab host "$RET":string
-  fi
-  
-  if db_get gitlabhq/gitlab/gitlab/port
-  then
-    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitlab port "$RET":integer
-  fi
+  test -f $ymlfile || cp /var/www/gitlabhq/config/gitlab.yml.example $ymlfile
 
-  if db_get gitlabhq/gitlab/gitlab/https
-  then
-    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitlab https "$RET":boolean
-  fi
+  for tmp in gitlab:host:string gitlab:https:boolean gitlab:email_from:string \
+             gitolite:ssh_host:string ldap:enabled:boolean ldap:base:string   \
+             ldap:uid:string ldap:method:string ldap:bind_dn:string           \
+             ldap:password:string ldap:host:
+  do
+    group=$(echo $tmp | cut -d: -f1)
+    key=$(echo $tmp | cut -d: -f2)
+    type=$(echo $tmp | cut -d: -f3)
 
-  if db_get gitlabhq/gitlab/gitlab/email_from
-  then
-    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitlab email_from "$RET":string
-  fi
+    if db_get gitlabhq/gitlab/$group/$key
+    then
+      if [ $group = ldap -a $key = host ]
+      then
+        if expr "$RET" : "^.*:[0-9]\+$" >/dev/null
+        then
+          host=$(echo "$RET" | cut -d: -f1)
+          port=$(echo "$RET" | cut -d: -f2)
+          $bin_yamlset $ymlfile ldap host "$host":string
+          $bin_yamlset $ymlfile ldap port "$port":integer
+        else
+          $bin_yamlset $ymlfile ldap host "$RET":string
+          $bin_yamlset $ymlfile ldap port :delete
+        fi
+      else
+        $bin_yamlset $ymlfile $group $key "$RET":$type
+      fi
+    fi
+  done
 
-  if db_get gitlabhq/gitlab/gravatar/enabled
-  then
-    $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gravatar enabled "$RET":boolean
-  fi
-
-  $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitolite repos_path $githome/repositories:string
-  $bin_yamlset /var/www/gitlabhq/config/gitlab.yml gitolite hooks_path $githome/.gitolite/hooks:string
+  $bin_yamlset $ymlfile gitolite repos_path $githome/repositories:string
+  $bin_yamlset $ymlfile gitolite hooks_path $githome/.gitolite/hooks:string
 }
 
 gitlabhq_configure_database () {
-  local host port dport
-  test -f /var/www/gitlabhq/config/database.yml || cp /var/www/gitlabhq/config/database.yml.mysql /var/www/gitlabhq/config/database.yml
+  local host port tmp key type ymlfile
+  ymlfile=/var/www/gitlabhq/config/database.yml
 
-  if db_get gitlabhq/database/driver
-  then
-    if [ "$RET" = "mysql" ]
+  test -f $ymlfile || cp /var/www/gitlabhq/config/database.yml.mysql $ymlfile
+
+  for tmp in adapter:string database:string pool:integer username:string password:string host:
+  do
+    key=$(echo $tmp | cut -d: -f1)
+    type=$(echo $tmp | cut -d: -f2)
+  
+    if db_get gitlabhq/database/production/$key
     then
-      $bin_yamlset /var/www/gitlabhq/config/database.yml production adapter mysql2:string
-      dport=3306
-    elif [ "$RET" = "postgresql" ]
-    then
-      dport=5432
-      $bin_yamlset /var/www/gitlabhq/config/database.yml production adapter postgresql:string
-    fi
-  fi
-
-  if db_get gitlabhq/database/name
-  then
-    $bin_yamlset /var/www/gitlabhq/config/database.yml production database "$RET":string
-  fi
-
-  if db_get gitlabhq/database/pool
-  then
-    $bin_yamlset /var/www/gitlabhq/config/database.yml production pool "$RET":integer
-  fi
-
-  if db_get gitlabhq/database/username
-  then
-    $bin_yamlset /var/www/gitlabhq/config/database.yml production username "$RET":string
-  fi
-
-  if db_get gitlabhq/database/password
-  then
-    $bin_yamlset /var/www/gitlabhq/config/database.yml production password "$RET":string
-  fi
-
-  if db_get gitlabhq/database/host
-  then
-    if expr "$RET" : "^/" >/dev/null
-    then
-      $bin_yamlset /var/www/gitlabhq/config/database.yml production socket "$RET":string
-      $bin_yamlset /var/www/gitlabhq/config/database.yml production host :delete
-      $bin_yamlset /var/www/gitlabhq/config/database.yml production port :delete
-    else
-      host=$(echo "$RET" | cut -d: -f1)
-      port=$(echo "$RET" | cut -d: -f2)
-      $bin_yamlset /var/www/gitlabhq/config/database.yml production socket :delete
-      $bin_yamlset /var/www/gitlabhq/config/database.yml production host "$host":string
-      if [ "$port" = "$host" -o -z "$port" ]
+      if [ $key = host ]
       then
-        $bin_yamlset /var/www/gitlabhq/config/database.yml production port "$dport":integer
+        if expr "$RET" : "^/.*$" >/dev/null
+        then
+          $bin_yamlset $ymlfile production socket "$RET":string
+          $bin_yamlset $ymlfile production host :delete
+          $bin_yamlset $ymlfile production port :delete
+        elif expr "$RET" : "^.*:[0-9]\+$" >/dev/null
+        then
+          host=$(echo "$RET" | cut -d: -f1)
+          port=$(echo "$RET" | cut -d: -f2)
+          $bin_yamlset $ymlfile production socket :delete
+          $bin_yamlset $ymlfile production host "$host":string
+          $bin_yamlset $ymlfile production port "$port":integer
+        else
+          $bin_yamlset $ymlfile production socket :delete
+          $bin_yamlset $ymlfile production port :delete
+          $bin_yamlset $ymlfile production host "$RET":string
+        fi
       else
-        $bin_yamlset /var/www/gitlabhq/config/database.yml production port "$port":integer
+        $bin_yamlset $ymlfile production $key "$RET":$type
       fi
     fi
-  fi
+  done
 }
 
 gitlabhq_configure_git () {

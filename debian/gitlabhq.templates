@@ -1,30 +1,36 @@
-Template: gitlabhq/gitlab/gitlab/hostname
+Template: gitlabhq/gitlab/gitlab/host
 Type: string
 Default: localhost
 Description: Webserver hostname
  The host name the web server is using to serve gitlab. Make sure
- this match the configuration of your webserver.
+ this match the configuration of your webserver
 
 Template: gitlabhq/gitlab/gitlab/port
 Type: string
 Default: 80
 Description: Werbserver port number
  The port number the web server is using to serve gitlab. Make sure
- this match the configuration of your webserver.
+ this match the configuration of your webserver
 
 Template: gitlabhq/gitlab/gitlab/https
 Type: boolean
 Default: false
 Description: Enable HTTP?
  Set this to true if you plan to require SSL to access to the web
- interface. Make sure this match the configuration of your webserver.
+ interface. Make sure this match the configuration of your webserver
+
+Template: gitlabhq/gitlab/gitolite/ssh_host
+Type: string
+Default: localhost
+Description: The SSH host users will use to connect using git
+ Hopefully this will have the same value as `webserver hostname'
 
 Template: gitlabhq/gitlab/gravatar/enabled
 Type: boolean
 Default: true
 Description: Enable gravatar?
  Gravatar is an online service to manage user avatars. Use true if you
- are unsure.
+ are unsure
 
 Template: gitlabhq/gitlab/gitlab/email_from
 Type: string
@@ -33,37 +39,87 @@ Description: Email address
  This defines the username gitlab will use in the From field. It is
  also used in the gitconfig file (user.email entry)
 
-Template: gitlabhq/database/driver
+Template: gitlabhq/database/production/adapter
 Type: select
-Choices: mysql, postgresql
-Default: mysql
-Description: Which database driver you want to use?
+Choices: mysql2, postgresql
+Default: mysql2
+Description: Which database adapter you want to use?
 
-Template: gitlabhq/database/name
+Template: gitlabhq/database/production/database
 Type: string
 Default: gitlabhq_production
 Description: The database name
 
-Template: gitlabhq/database/username
+Template: gitlabhq/database/production/username
 Type: string
 Default: gitlabhq
 Description: The username to connect to the database
 
-Template: gitlabhq/database/password
+Template: gitlabhq/database/production/password
 Type: password
 Description: The password to connect to the database
 
-Template: gitlabhq/database/pool
+Template: gitlabhq/database/production/pool
 Type: string
 Default: 5
 Description: Connection pool size
  Connection pool may greatly improve performance at the cost of
  higher resources consumption
 
-Template: gitlabhq/database/host
+Template: gitlabhq/database/production/host
 Type: string
 Default: localhost
 Description: The hostname or unix socket to connect to the database
  If this starts with a / (slash), it will be used as a unix
  socket. For instance, `localhost:3306' or `localhost' are both
  hostnames, whereas /tmp/database.xsock is a unix socket
+
+Template: gitlabhq/gitlab/ldap/enabled
+Type: boolean
+Default: false
+Description: Enable LDAP authentication?
+ Gitlabhq is able to use LDAP to perform authentication. If this is
+ set to `true', the next series of questions takes the information
+ required to use LDAP as the authencation database
+
+Template: gitlabhq/gitlab/ldap/host
+Type: string
+Description: LDAP hostname
+ The address where the LDAP server is running [e.g.: localhost:636]
+
+Template: gitlabhq/gitlab/ldap/base
+Type: string
+Description: The base where you search for users
+ The name of the base object entry (or possibly the root) relative to
+ which the search is to be performed. Example: `dc=people,
+ dc=organization, dc=com'
+
+Template: gitlabhq/gitlab/ldap/method
+Type: select
+Choices: plain, ssl, tls
+Default: plain
+Description: Method to connect
+ It is advisable to use either SSL or TLS, if you server provides
+ support for it
+
+Template: gitlabhq/gitlab/ldap/bind_dn
+Type: string
+Description: The user credential used to connect
+ Since many LDAP servers don't allow anonymous access, search function
+ will require a bound connection, :bind_dn and :password will be
+ required for searching on the username or email to retrieve the DN
+ attribute for the user. If the LDAP server allows anonymous access,
+ you don't need to provide these two parameters
+
+Template: gitlabhq/gitlab/ldap/password
+Type: password
+Description: The password used to connect
+ This is only required if your server does not accept anonymous
+ access and you have provided an username previously
+
+Template: gitlabhq/gitlab/ldap/uid
+Type: string
+Default: uid
+Description: The LDAP attribute name for the user name in the login form
+ Typically AD would be `sAMAccountName' or `UserPrincipalName', while
+ OpenLDAP is `uid'
