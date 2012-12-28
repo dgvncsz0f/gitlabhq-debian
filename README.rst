@@ -5,7 +5,7 @@
 :todo: Database setup:
        https://github.com/gitlabhq/gitlabhq/blob/stable/doc/install/databases.md;
 :todo: App initialization: rake gitlab:app:setup RAILS_ENV=production;
-:todo: Create an init script;
+:todo: logrotate.d config files
 
 Provides a debian binary package for gitlab & gitolite.
 
