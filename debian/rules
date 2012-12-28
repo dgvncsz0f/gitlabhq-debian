@@ -25,7 +25,7 @@ clean:
 	rm -r -f $(tmproot) build-gitlabhq install-gitlabhq install-gitolite
 	dh_clean
 
-build: build-arch build-indep
+build: get-orig-source build-arch build-indep
 
 build-arch: build-gitlabhq
 
