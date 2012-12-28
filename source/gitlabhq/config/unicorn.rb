@@ -2,16 +2,14 @@ app_dir = "/var/www/gitlabhq"
 worker_processes 2
 working_directory app_dir
 
-# Load app into the master before forking workers for super-fast
-# worker spawn times
+# Load rails+github.git into the master before forking workers
+# for super-fast worker spawn times
 preload_app true
 
-# nuke workers after 30 seconds (60 is the default)
+# Restart any workers that haven't responded in 30 seconds
 timeout 30
 
-# listen on a Unix domain socket and/or a TCP port,
 listen "#{app_dir}/tmp/sockets/gitlab.socket"
-
 pid "#{app_dir}/tmp/pids/unicorn.pid"
 stderr_path "#{app_dir}/log/unicorn.stderr.log"
 stdout_path "#{app_dir}/log/unicorn.stdout.log"
@@ -20,7 +18,6 @@ stdout_path "#{app_dir}/log/unicorn.stdout.log"
 if GC.respond_to?(:copy_on_write_friendly=)
   GC.copy_on_write_friendly = true
 end
-
 
 before_fork do |server, worker|
   # the following is highly recomended for Rails + "preload_app true"
@@ -54,8 +51,21 @@ after_fork do |server, worker|
   # Unicorn master loads the app then forks off workers - because of the way
   # Unix forking works, we need to make sure we aren't using any of the parent's
   # sockets, e.g. db connection
-
   defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
   # Redis and Memcached would go here but their connections are established
   # on demand, so the master never opens a socket
+
+  ##
+  # Unicorn master is started as root, which is fine, but let's
+  # drop the workers to git:git
+  uid, gid    = Process.euid, Process.egid
+  user, group = "gitlab", "gitlab"
+  target_uid  = Etc.getpwnam(user).uid
+  target_gid  = Etc.getgrnam(group).gid
+  worker.tmp.chown(target_uid, target_gid)
+  if uid != target_uid || gid != target_gid
+    Process.initgroups(user, target_gid)
+    Process::GID.change_privilege(target_gid)
+    Process::UID.change_privilege(target_uid)
+  end
 end
