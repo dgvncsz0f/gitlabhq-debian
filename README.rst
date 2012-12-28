@@ -158,3 +158,9 @@ It takes only three steps:
 ::
 
   $ dpkg-buildpackage # -uc -us
+
+Now you should have available the following packages:
+
+* gitlab
+
+* gitlabh-gitolite
