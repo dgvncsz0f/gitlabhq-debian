@@ -2,8 +2,8 @@ Template: gitlabhq/gitlab/gitlab/host
 Type: string
 Default: localhost
 Description: Webserver hostname
- The host name the web server is using to serve gitlab. Make sure
- this match the configuration of your webserver
+ The host name the web server is using to serve gitlab. Make sure this
+ match the configuration of your webserver. [gitlab.yml#gitlab.host]
 
 Template: gitlabhq/gitlab/gitlab/port
 Type: string
@@ -11,6 +11,7 @@ Default: 80
 Description: Werbserver port number
  The port number the web server is using to serve gitlab. Make sure
  this match the configuration of your webserver
+ [gitlab.yml#gitlab.port]
 
 Template: gitlabhq/gitlab/gitlab/https
 Type: boolean
@@ -18,59 +19,67 @@ Default: false
 Description: Enable HTTP?
  Set this to true if you plan to require SSL to access to the web
  interface. Make sure this match the configuration of your webserver
+ [gitlab.yml#gitlab.https]
 
 Template: gitlabhq/gitlab/gitlab/default_projects_limit
 Type: string
 Default: 10
 Description: The default number of projects new users have
  The number can change from within Gitlab by an administrator
+ [gitlab.yml#gitlab.default_projects_limit]
 
 Template: gitlabhq/gitlab/gitolite/ssh_host
 Type: string
 Default: localhost
 Description: The SSH host users will use to connect using git
  Hopefully this will have the same value as `webserver hostname'
+ [gitlab.yml#gitolite.ssh_host]
 
 Template: gitlabhq/gitlab/gravatar/enabled
 Type: boolean
 Default: true
 Description: Enable gravatar?
  Gravatar is an online service to manage user avatars. Use true if you
- are unsure
+ are unsure [gitlab.yml#gravatar.enabled]
 
 Template: gitlabhq/gitlab/gitlab/email_from
 Type: string
 Default: gitlab@localhost
 Description: Email address
  This defines the username gitlab will use in the From field. It is
- also used in the gitconfig file (user.email entry)
+ also used in the gitconfig file [.gitconfig#user.email &
+ gitlab.yml#gitlab.email_from]
 
 Template: gitlabhq/database/production/adapter
 Type: select
 Choices: mysql2, postgresql
 Default: mysql2
 Description: Which database adapter you want to use?
+ [database.yml#production.adapter]
 
 Template: gitlabhq/database/production/database
 Type: string
 Default: gitlabhq_production
 Description: The database name
+ [database.yml#production.database]
 
 Template: gitlabhq/database/production/username
 Type: string
 Default: gitlabhq
 Description: The username to connect to the database
+ [database.yml#production.username]
 
 Template: gitlabhq/database/production/password
 Type: password
 Description: The password to connect to the database
+ [database.yml#production.password]
 
 Template: gitlabhq/database/production/pool
 Type: string
 Default: 5
 Description: Connection pool size
  Connection pool may greatly improve performance at the cost of
- higher resources consumption
+ higher resources consumption [database.yml#production.pool]
 
 Template: gitlabhq/database/production/host
 Type: string
@@ -79,6 +88,8 @@ Description: The hostname or unix socket to connect to the database
  If this starts with a / (slash), it will be used as a unix
  socket. For instance, `localhost:3306' or `localhost' are both
  hostnames, whereas /tmp/database.xsock is a unix socket
+ [database.yml#production.host, database.yml#production.port,
+ database.yml#production.socket]
 
 Template: gitlabhq/gitlab/ldap/enabled
 Type: boolean
@@ -87,18 +98,20 @@ Description: Enable LDAP authentication?
  Gitlabhq is able to use LDAP to perform authentication. If this is
  set to `true', the next series of questions takes the information
  required to use LDAP as the authencation database
+ [gitlab.yml#ldap.enabled]
 
 Template: gitlabhq/gitlab/ldap/host
 Type: string
 Description: LDAP hostname
  The address where the LDAP server is running [e.g.: localhost:636]
+ [gitlab.yml#ldap.host, gitlab.yml#ldap.port]
 
 Template: gitlabhq/gitlab/ldap/base
 Type: string
 Description: The base where you search for users
  The name of the base object entry (or possibly the root) relative to
  which the search is to be performed. Example: `dc=people,
- dc=organization, dc=com'
+ dc=organization, dc=com' [gitlab.yml#ldap.base]
 
 Template: gitlabhq/gitlab/ldap/method
 Type: select
@@ -106,7 +119,7 @@ Choices: plain, ssl, tls
 Default: plain
 Description: Method to connect
  It is advisable to use either SSL or TLS, if you server provides
- support for it
+ support for it [gitlab.yml#ldap.method]
 
 Template: gitlabhq/gitlab/ldap/bind_dn
 Type: string
@@ -116,19 +129,21 @@ Description: The user credential used to connect
  required for searching on the username or email to retrieve the DN
  attribute for the user. If the LDAP server allows anonymous access,
  you don't need to provide these two parameters
+ [gitlab.yml#ldap.bind_dn]
 
 Template: gitlabhq/gitlab/ldap/password
 Type: password
 Description: The password used to connect
- This is only required if your server does not accept anonymous
- access and you have provided an username previously
+ This is only required if your server does not accept anonymous access
+ and you have provided an username previously
+ [gitlab.yml#ldap.password]
 
 Template: gitlabhq/gitlab/ldap/uid
 Type: string
 Default: uid
 Description: The LDAP attribute name for the user name in the login form
  Typically AD would be `sAMAccountName' or `UserPrincipalName', while
- OpenLDAP is `uid'
+ OpenLDAP is `uid' [gitlab.yml#ldap.uid]
 
 Template: gitlabhq/run_assets_precompile
 Type: boolean
@@ -137,3 +152,9 @@ Description: Invoke rake assets:precompile automatically?
  Assets precompile improve performance of your web application. If you
  decide to no run this, make sure to invoke `rake assets:precompile'
  before starting the application
+
+Template: gitlabhq/gitlab/backup/path
+Type: string
+Default: /var/backup/gitlabhq
+Description: The directory to write backups to
+ [gitlab.yml#backup.path]
