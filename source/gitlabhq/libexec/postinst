@@ -160,6 +160,7 @@ gitlabhq_assets_precompile () {
     if [ "$RET" = true ]
     then
       (cd /var/www/gitlabhq && /usr/libexec/gitlabhq/sudo-env rake assets:precompile 1>&2) || true
+      db_set gitlabhq/run_assets_precompile false || true
     fi
   fi
 }
