@@ -25,7 +25,7 @@ gitlabhq itself to validate the deployment:
 ::
 
   $ cd /var/www/gitlabhq
-  $ su gitlab -c "/usr/libexec/gitlabhq/env rake gitlab:check"
+  $ /usr/libexec/gitlabhq/sudo-env rake gitlab:check
 
 Installing
 ==========
@@ -38,10 +38,10 @@ Installing
   $ cd /var/www/gitlabhq
 
   # initialize the application
-  $ su gitlab -c "/usr/libexec/gitlabhq/env rake gitlab:app:setup"
+  $ /usr/libexec/gitlabhq/sudo-env rake gitlab:app:setup
 
   # verify everything is Ok
-  $ su gitlab -c "/usr/libexec/gitlabhq/env rake gitlab:check"
+  $ /usr/libexec/gitlabhq/sudo-env rake gitlab:check
 
   # yay!
   $ /etc/init.d/gitlabhq start
@@ -120,25 +120,26 @@ the gems managed by it:
 
 * /usr/libexec/gitlabhq/env
 
+* /usr/libexec/gitlabhq/sudo-env # alias for: `sudo -u gitlab -H /usr/.../gitlabhq/env`
+
 To use it, simply prefix the command you want with that script, as
 follows:
 ::
 
+  $ cd /var/www/gitlabhq
+
   # the following are all the same
-  $ /usr/libexec/gitlabhq/env rake gitlab:env:info
-  $ /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info
-  $ /usr/libexec/gitlabhq/env bundle exec rake gitlab:env:info RAILS_ENV=production
+  $ /usr/libexec/gitlabhq/sudo-env rake gitlab:env:info
+  $ /usr/libexec/gitlabhq/sudo-env bundle exec rake gitlab:env:info
+  $ /usr/libexec/gitlabhq/sudo-env bundle exec rake gitlab:env:info RAILS_ENV=production
 
   # to access rails console
-  $ /usr/libexec/gitlabhq/env rails console
+  $ /usr/libexec/gitlabhq/sudo-env rails console
 
   # notably, mind these:
-  $ /usr/libexec/gitlabhq/env python2
-  $ /usr/libexec/gitlabhq/env ruby
-  $ /usr/libexec/gitlabhq/env gem
-
-  # To use something other than production
-  $ env RAILS_ENV=custom /usr/libexec/gitlabhq/env ...
+  $ /usr/libexec/gitlabhq/sudo-env python2
+  $ /usr/libexec/gitlabhq/sudo-env ruby
+  $ /usr/libexec/gitlabhq/sudo-env gem
 
 Building
 ========
