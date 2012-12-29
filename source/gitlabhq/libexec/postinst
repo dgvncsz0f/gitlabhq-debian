@@ -33,7 +33,7 @@ gitlabhq_deploy_keys () {
     chmod 0444 $glhome/.ssh/id_rsa.pub
 
     cp $glhome/.ssh/id_rsa.pub $githome/gitlab.pub
-    su -c "gitolite setup -pk $githome/gitlab.pub" git 1>&2
+    sudo -u git -H "gitolite setup -pk $githome/gitlab.pub" 1>&2
   }
 }
 
@@ -149,8 +149,8 @@ gitlabhq_configure_database () {
 gitlabhq_configure_git () {
   if db_get gitlabhq/gitlab/gitlab/email_from
   then
-    su -c "git config --global user.name GitLab" gitlab
-    su -c "git config --global user.email \"$RET\"" gitlab
+    sudo -u gitlab -H git config --global user.name GitLab
+    sudo -u gitlab -H git config --global user.email "$RET"
   fi
 }
 
@@ -159,7 +159,7 @@ gitlabhq_assets_precompile () {
   then
     if [ "$RET" = true ]
     then
-      (cd /var/www/gitlabhq && su gitlab -c "/usr/libexec/gitlabhq/env rake assets:precompile") || true
+      (cd /var/www/gitlabhq && /usr/libexec/gitlabhq/sudo-env rake assets:precompile 1>&2) || true
     fi
   fi
 }
