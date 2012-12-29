@@ -24,7 +24,8 @@ dependencies right [namely the database and redis], you can use
 gitlabhq itself to validate the deployment:
 ::
 
-  $ su - gitlab -c "cd /var/www/gitlabhq; /usr/libexec/gitlabhq/env rake gitlab:check"
+  $ cd /var/www/gitlabhq
+  $ su gitlab -c "/usr/libexec/gitlabhq/env rake gitlab:check"
 
 Installing
 ==========
@@ -34,11 +35,13 @@ Installing
   $ apt-get install gitlabhq-gitolite gitolite
   $ dpkg-reconfigure gitlabhq
 
+  $ cd /var/www/gitlabhq
+
   # initialize the application
-  $ su - gitlab -c "cd /var/www/gitlabhq; /usr/libexec/gitlabhq/env rake gitlab:app:setup"
+  $ su gitlab -c "/usr/libexec/gitlabhq/env rake gitlab:app:setup"
 
   # verify everything is Ok
-  $ su - gitlab -c "cd /var/www/gitlabhq; /usr/libexec/gitlabhq/env rake gitlab:check"
+  $ su gitlab -c "/usr/libexec/gitlabhq/env rake gitlab:check"
 
   # yay!
   $ /etc/init.d/gitlabhq start
