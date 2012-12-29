@@ -77,7 +77,8 @@ gitlabhq_configure_gitlab () {
   for tmp in gitlab:host:string gitlab:https:boolean gitlab:email_from:string \
              gitolite:ssh_host:string ldap:enabled:boolean ldap:base:string   \
              ldap:uid:string ldap:method:string ldap:bind_dn:string           \
-             ldap:password:string ldap:host:
+             ldap:password:string ldap:host:                                  \
+             gitlab:default_projects_limit:integer
   do
     group=$(echo $tmp | cut -d: -f1)
     key=$(echo $tmp | cut -d: -f2)
