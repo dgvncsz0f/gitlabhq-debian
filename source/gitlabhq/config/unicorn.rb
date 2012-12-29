@@ -23,6 +23,7 @@ before_fork do |server, worker|
   # the following is highly recomended for Rails + "preload_app true"
   # as there's no need for the master process to hold a connection
   defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
+  defined?(Resque) and Resque.redis.client.disconnect
 
   ##
   # When sent a USR2, Unicorn will suffix its pidfile with .oldbin and
@@ -52,8 +53,6 @@ after_fork do |server, worker|
   # Unix forking works, we need to make sure we aren't using any of the parent's
   # sockets, e.g. db connection
   defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
-  # Redis and Memcached would go here but their connections are established
-  # on demand, so the master never opens a socket
 
   ##
   # Unicorn master is started as root, which is fine, but let's
