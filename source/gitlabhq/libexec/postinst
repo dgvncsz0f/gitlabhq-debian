@@ -33,7 +33,7 @@ gitlabhq_deploy_keys () {
     chmod 0444 $glhome/.ssh/id_rsa.pub
 
     cp $glhome/.ssh/id_rsa.pub $githome/gitlab.pub
-    sudo -u git -H "gitolite setup -pk $githome/gitlab.pub" 1>&2
+    sudo -u git -H gitolite setup -pk $githome/gitlab.pub 1>&2
   }
 }
 
