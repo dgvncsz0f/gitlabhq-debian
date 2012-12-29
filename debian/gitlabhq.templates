@@ -20,7 +20,7 @@ Description: Enable HTTP?
  interface. Make sure this match the configuration of your webserver
 
 Template: gitlabhq/gitlab/gitlab/default_projects_limit
-Type: integer
+Type: string
 Default: 10
 Description: The default number of projects new users have
  The number can change from within Gitlab by an administrator
