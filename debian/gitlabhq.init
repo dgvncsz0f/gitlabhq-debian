@@ -68,12 +68,12 @@ start() {
                                               --user "$USER"           \
                                               --group "$GROUP"         \
                                               --oknodo                 \
-                                              --start -- exec sidekiq:start $SIDEKIQ_OPTS
+                                              --start -- sidekiq:start $SIDEKIQ_OPTS
 }
 
 stop() {
   [ -f "$pid_unicorn" ] && /usr/libexec/gitlabhq/env start-stop-daemon --stop --retry 10 --pidfile "$pid_unicorn"
-  [ -f "$pid_sidekiq" ] && (cd "$approot"; /usr/libexec/gitlabhq/env rake stop sidekiq:stop)
+  [ -f "$pid_sidekiq" ] && (cd "$approot"; /usr/libexec/gitlabhq/env "$bin_rake" sidekiq:stop)
   rm -f "$pid_unicorn" "$pid_sidekiq"
 }
 
