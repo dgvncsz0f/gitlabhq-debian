@@ -16,16 +16,16 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-# The username to run rails and resque
+# The username to run rails and sidekiq
 USER=gitlab
 
-# The group to run rails and resque
+# The group to run rails and sidekiq
 GROUP=gitlab
 
 # Extra options to be given to unicorn upon starting
 UNICORN_OPTS=
 
-# Extra options to be given to rake upon starting resque
+# Extra options to be given to rake upon starting sidekiq
 RAKE_OPTS=
 
 # The rails env to start proc with
@@ -37,7 +37,7 @@ DESC="Gitlab service"
 approot="/var/www/gitlabhq"
 pidroot=$approot/tmp/pids
 pid_unicorn=$pidroot/unicorn.pid
-pid_resque=$pidroot/resque.pid
+pid_sidekiq=$pidroot/sidekiq.pid
 bin_unicorn=$approot/vendor/bin/unicorn_rails
 bin_daemon=/usr/bin/daemon
 bin_rake=$approot/vendor/bin/rake
@@ -62,28 +62,19 @@ start() {
                                                          --daemonize                                \
                                                          $UNICORN_OPTS
 
-  /usr/libexec/gitlabhq/env start-stop-daemon --chdir "$approot"      \
-                                              --pidfile "$pid_resque" \
-                                              --startas "$bin_daemon" \
-                                              --oknodo                \
-                                              --start -- --user=$USER:$GROUP                         \
-                                                         --chdir="$approot"                          \
-                                                         --command=$bin_rake                         \
-                                                         --inherit                                   \
-                                                         --env=QUEUE=post_receive,mailer,system_hook \
-                                                         --env=RAILS_ENV=$RAILS_ENV                  \
-                                                         --pidfile=$pid_resque                       \
-                                                         --output="$approot/log/resque.log"          \
-                                                         --                                          \
-                                                         environment                                 \
-                                                         resque:work                                 \
-                                                         $RESQUE_OPTS
+  /usr/libexec/gitlabhq/env start-stop-daemon --chdir "$approot"       \
+                                              --pidfile "$pid_sidekiq" \
+                                              --startas "$bin_rake"    \
+                                              --user "$USER"           \
+                                              --group "$GROUP"         \
+                                              --oknodo                 \
+                                              --start -- exec sidekiq:start $SIDEKIQ_OPTS
 }
 
 stop() {
   [ -f "$pid_unicorn" ] && /usr/libexec/gitlabhq/env start-stop-daemon --stop --retry 10 --pidfile "$pid_unicorn"
-  [ -f "$pid_resque" ] && /usr/libexec/gitlabhq/env start-stop-daemon --stop --retry 10 --pidfile "$pid_resque"
-  rm -f "$pid_unicorn" "$pid_resque"
+  [ -f "$pid_sidekiq" ] && (cd "$approot"; /usr/libexec/gitlabhq/env rake stop sidekiq:stop)
+  rm -f "$pid_unicorn" "$pid_sidekiq"
 }
 
 case "$1" in
