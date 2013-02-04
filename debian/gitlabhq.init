@@ -62,18 +62,17 @@ start() {
                                                          --daemonize                                \
                                                          $UNICORN_OPTS
 
-  /usr/libexec/gitlabhq/env start-stop-daemon --chdir "$approot"       \
-                                              --pidfile "$pid_sidekiq" \
-                                              --startas "$bin_rake"    \
-                                              --user "$USER"           \
-                                              --group "$GROUP"         \
-                                              --oknodo                 \
-                                              --start -- sidekiq:start $SIDEKIQ_OPTS
+  /usr/libexec/gitlabhq/sudo-env start-stop-daemon --chdir "$approot"       \
+                                                   --pidfile "$pid_sidekiq" \
+                                                   --startas "$bin_rake"    \
+                                                   --group "$GROUP"         \
+                                                   --oknodo                 \
+                                                   --start -- sidekiq:start $SIDEKIQ_OPTS
 }
 
 stop() {
   [ -f "$pid_unicorn" ] && /usr/libexec/gitlabhq/env start-stop-daemon --stop --retry 10 --pidfile "$pid_unicorn"
-  [ -f "$pid_sidekiq" ] && (cd "$approot"; /usr/libexec/gitlabhq/env "$bin_rake" sidekiq:stop)
+  [ -f "$pid_sidekiq" ] && /usr/libexec/gitlabhq/env start-stop-daemon --stop --retry 10 --pidfile "$pid_sidekiq"
   rm -f "$pid_unicorn" "$pid_sidekiq"
 }
 
