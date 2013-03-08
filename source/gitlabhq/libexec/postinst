@@ -179,6 +179,15 @@ gitlabhq_assets_precompile () {
   fi
 }
 
+# it can't be helped, unless you can bare the 500 errors. the bundler version
+# doesn't work:
+# https://github.com/gitlabhq/gitlabhq/issues/679
+gitlabhq_fixtheshit_charlock_holmes () {
+  /usr/libexec/gitlabhq/env gem install charlock_holmes --version 0.6.9 --no-rdoc --no-ri
+  rm -r -f /var/www/gitlabhq/vendor/bundle/ruby/1.9.1/gems/charlock_holmes-0.6.9
+  ln -s -f -n /var/www/gitlabhq/vendor/0/gems/charlock_holmes-0.6.9 /var/www/gitlabhq/vendor/bundle/ruby/1.9.1/gems/charlock_holmes-0.6.9
+}
+
 gitlabhq_mkdirs
 gitlabhq_deploy_keys
 gitlabhq_deploy_hooks
@@ -187,3 +196,4 @@ gitlabhq_configure_gitlab
 gitlabhq_configure_database
 gitlabhq_fixperms
 gitlabhq_assets_precompile
+gitlabhq_fixtheshit_charlock_holmes
