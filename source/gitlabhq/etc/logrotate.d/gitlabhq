@@ -1,0 +1,8 @@
+/var/log/gitlabhq/*.log {
+  missingok
+  size 100M
+  rotate 7
+  notifempty
+  compress
+  copytruncate
+}

@@ -76,8 +76,9 @@ install-gitlabhq:
 	mkdir -p $(debroot)/gitlabhq/var/log/gitlabhq
 	mkdir -p $(debroot)/gitlabhq/var/lib/gitlabhq
 	chown 0750 $(debroot)/gitlabhq/var/lib/gitlabhq
-	$(runinstall) $(srcroot)/source/gitlabhq/libexec $(debroot)/gitlabhq/usr/libexec/gitlabhq
-	$(runinstall) $(srcroot)/source/gitlabhq/.ssh    $(debroot)/gitlabhq/var/lib/gitlabhq/.ssh
+	$(runinstall) $(srcroot)/source/gitlabhq/libexec         $(debroot)/gitlabhq/usr/libexec/gitlabhq
+	$(runinstall) $(srcroot)/source/gitlabhq/etc/logrotate.d $(debroot)/gitlabhq/etc/logrotate.d
+	$(runinstall) $(srcroot)/source/gitlabhq/.ssh            $(debroot)/gitlabhq/var/lib/gitlabhq/.ssh
 	for f in app .bundle config db doc features lib public script vendor                                      \
                  config.ru Gemfile Gemfile.lock Rakefile VERSION;                                                 \
         do                                                                                                        \
