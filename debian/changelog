@@ -1,3 +1,8 @@
+gitlabhq (4.2-2) UNRELEASED; urgency=low
+
+  * Updating to the latest gitlab 4.2
+  * Adding ruby1.9.1 minimum version (the gitlab:setup talk fails for older versions)
+
 gitlabhq (4.2-1) UNRELEASED; urgency=low
 
   * Packing gitlab 4.2
