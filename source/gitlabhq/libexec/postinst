@@ -115,6 +115,8 @@ gitlabhq_configure_gitlab () {
           fi
           $bin_yamlset $ymlfile $group $key "$RET":$type
         fi
+      else
+        $bin_yamlset $ymlfile $group $key "$RET":$type
       fi
     fi
   done
