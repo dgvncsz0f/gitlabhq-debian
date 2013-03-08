@@ -43,6 +43,11 @@ gitlabhq_mkdirs () {
   test -d /var/www/gitlabhq/tmp || mkdir -p /var/www/gitlabhq/tmp
   test -d /var/www/gitlabhq/tmp/sockets || mkdir -p /var/www/gitlabhq/tmp/sockets
   test -d /var/www/gitlabhq/tmp/cache || mkdir -p /var/www/gitlabhq/tmp/cache
+  if db_get gitlabhq/gitlab/backup/path
+  then
+    mkdir -p "$RET"
+    chown gitlab "$RET"
+  fi
 }
 
 gitlabhq_fixperms () {
