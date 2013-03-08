@@ -38,6 +38,7 @@ gitlabhq_deploy_keys () {
 }
 
 gitlabhq_mkdirs () {
+  test -d $glhome/gitlab-satellites || mkdir -p $glhome/gitlab-satellites
   test -h /var/www/gitlabhq/log || ln -s /var/log/gitlabhq /var/www/gitlabhq/log
   test -d /var/www/gitlabhq/tmp || mkdir -p /var/www/gitlabhq/tmp
   test -d /var/www/gitlabhq/tmp/sockets || mkdir -p /var/www/gitlabhq/tmp/sockets
@@ -46,6 +47,7 @@ gitlabhq_mkdirs () {
 
 gitlabhq_fixperms () {
   chown gitlab /var/log/gitlabhq
+  chown gitlab $glhome/gitlab-satellites
 
   for name in database.yml gitlab.yml
   do
@@ -117,6 +119,7 @@ gitlabhq_configure_gitlab () {
     fi
   done
 
+  $bin_yamlset $ymlfile satellites path "$glhome/gitlab-satellites":string
   $bin_yamlset $ymlfile gitolite repos_path $githome/repositories:string
   $bin_yamlset $ymlfile gitolite hooks_path $githome/.gitolite/hooks:string
 }
