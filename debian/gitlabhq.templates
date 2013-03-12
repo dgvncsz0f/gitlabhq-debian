@@ -91,6 +91,14 @@ Description: The hostname or unix socket to connect to the database
  [database.yml#production.host, database.yml#production.port,
  database.yml#production.socket]
 
+Template: gitlabhq/gitlab/gitlab/signup_enabled
+Type: boolean
+Default: true
+Description: Allow non admin users to create accounts?
+ If are using an alternate authentication method, like LDAP, you
+ probably want to turn this off. This will enforce your main
+ authentication mechanism.
+
 Template: gitlabhq/gitlab/ldap/enabled
 Type: boolean
 Default: false
