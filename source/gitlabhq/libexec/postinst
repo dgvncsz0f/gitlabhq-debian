@@ -75,18 +75,59 @@ gitlabhq_deploy_hooks () {
   chown git:git $githome/.gitolite/hooks/common/post-receive
 }
 
+gitlabhq_configure_ldap () {
+  local host port tmp key type method ymlfile
+  ymlfile=/var/www/gitlabhq/config/gitlab.yml
+
+  test -f $ymlfile || cp /var/www/gitlabhq/config/gitlab.yml.example $ymlfile
+
+  # N.B.: make sure ldap:method goes before ldap:host
+  for tmp in enabled:boolean base:string method:string  \
+             uid:string host:string bind_dn:string    \
+             password:string
+  do
+    key=$(echo $tmp | cut -d: -f1)
+    type=$(echo $tmp | cut -d: -f2)
+
+    if db_get gitlabhq/gitlab/ldap/$key
+    then
+      if [ $key = host ]
+      then
+        if expr "$RET" : "^.*:[0-9]\+$" >/dev/null
+        then
+          host=$(echo "$RET" | cut -d: -f1)
+          port=$(echo "$RET" | cut -d: -f2)
+          $bin_yamlset $ymlfile ldap host "$host":string
+          $bin_yamlset $ymlfile ldap port "$port":integer
+        else
+          $bin_yamlset $ymlfile ldap host "$RET":string
+          if [ "$method" = "ssl" ]
+          then
+            $bin_ymlset $ymlfile ldap port 636:integer
+          else
+            $bin_yamlset $ymlfile ldap port 389:integer
+          fi
+        fi
+      else
+        if [ $key = method ]
+        then
+          method="$RET"
+        fi
+        $bin_yamlset $ymlfile ldap $key "$RET":$type
+      fi
+    fi
+  done
+}
+
 gitlabhq_configure_gitlab () {
   local host port tmp group key type method ymlfile
   ymlfile=/var/www/gitlabhq/config/gitlab.yml
 
   test -f $ymlfile || cp /var/www/gitlabhq/config/gitlab.yml.example $ymlfile
 
-  # N.B.: make sure ldap:method goes before ldap:host
   for tmp in gitlab:host:string gitlab:https:boolean gitlab:email_from:string \
-             gitolite:ssh_host:string ldap:enabled:boolean ldap:base:string   \
-             ldap:uid:string ldap:method:string ldap:bind_dn:string           \
-             ldap:password:string ldap:host:                                  \
-             gitlab:default_projects_limit:integer backup:path:string
+             gitolite:ssh_host:string gitlab:default_projects_limit:integer   \
+             backup:path:string gitlab:signup_enabled:boolean
   do
     group=$(echo $tmp | cut -d: -f1)
     key=$(echo $tmp | cut -d: -f2)
@@ -94,35 +135,7 @@ gitlabhq_configure_gitlab () {
 
     if db_get gitlabhq/gitlab/$group/$key
     then
-      if [ $group = ldap ]
-      then
-        if [ $key = host ]
-        then
-          if expr "$RET" : "^.*:[0-9]\+$" >/dev/null
-          then
-            host=$(echo "$RET" | cut -d: -f1)
-            port=$(echo "$RET" | cut -d: -f2)
-            $bin_yamlset $ymlfile ldap host "$host":string
-            $bin_yamlset $ymlfile ldap port "$port":integer
-          else
-            $bin_yamlset $ymlfile ldap host "$RET":string
-            if [ "$method" = "ssl" ]
-            then
-              $bin_ymlset $ymlfile ldap port 636:integer
-            else
-              $bin_yamlset $ymlfile ldap port 389:integer
-            fi
-          fi
-        else
-          if [ $key = method ]
-          then
-            method="$RET"
-          fi
-          $bin_yamlset $ymlfile $group $key "$RET":$type
-        fi
-      else
-        $bin_yamlset $ymlfile $group $key "$RET":$type
-      fi
+      $bin_yamlset $ymlfile $group $key "$RET":$type
     fi
   done
 
@@ -202,6 +215,7 @@ gitlabhq_mkdirs
 gitlabhq_deploy_keys
 gitlabhq_deploy_hooks
 gitlabhq_configure_git
+gitlabhq_configure_ldap
 gitlabhq_configure_gitlab
 gitlabhq_configure_database
 gitlabhq_fixperms
