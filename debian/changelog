@@ -1,3 +1,9 @@
+gitlabhq (4.2-6) UNRELEASED; urgency=low
+
+  * yaml-set now allows querying values (:dump action)
+
+ -- Diego Souza <dsouza@c0d3.xxx>  Thu, 14 Mar 2013 10:30:00 -0300
+
 gitlabhq (4.2-5) UNRELEASED; urgency=low
 
   * adding postinst is now is able to configure gitlab.signaup_enabled
