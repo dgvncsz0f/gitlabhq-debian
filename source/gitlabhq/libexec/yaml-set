@@ -27,6 +27,8 @@ elsif (val.end_with?(":list"))
   tmp[key] << val[0..-6]
 elsif (val == ":delete")
   tmp.delete(key)
+elsif (val == ":dump")
+  $stdout.write tmp[k]
 end
 
 File.open(ARGV[0], "w") {|fh| YAML.dump(mem, fh)}
