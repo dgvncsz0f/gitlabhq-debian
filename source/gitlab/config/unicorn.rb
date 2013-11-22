@@ -1,5 +1,5 @@
-app_dir = "/var/www/gitlabhq"
-worker_processes 2
+app_dir = "/var/lib/git/gitlab"
+worker_processes 32
 working_directory app_dir
 
 # Load rails+github.git into the master before forking workers
@@ -7,7 +7,7 @@ working_directory app_dir
 preload_app true
 
 # Restart any workers that haven't responded in 30 seconds
-timeout 30
+timeout 60
 
 listen "#{app_dir}/tmp/sockets/gitlab.socket"
 pid "#{app_dir}/tmp/pids/unicorn.pid"
@@ -58,7 +58,7 @@ after_fork do |server, worker|
   # Unicorn master is started as root, which is fine, but let's
   # drop the workers to git:git
   uid, gid    = Process.euid, Process.egid
-  user, group = "gitlab", "gitlab"
+  user, group = "git", "git"
   target_uid  = Etc.getpwnam(user).uid
   target_gid  = Etc.getgrnam(group).gid
   worker.tmp.chown(target_uid, target_gid)

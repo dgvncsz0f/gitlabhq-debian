@@ -6,52 +6,61 @@ tmproot      = $(srcroot)/tmp
 debroot      = $(srcroot)/debian
 
 bin_find    ?= find
+bin_wget    ?= wget -q
+bin_tar     ?= tar
 bin_git     ?= git
 bin_install ?= install
 bin_env     ?= env
+bin_ln      ?= ln
 bin_gem     ?= gem1.9.1
-getversion   = $(bin_env) GIT_DIR=$(srcroot)/source/gitolite.git/.git \
-                          $(bin_git) describe --tags --long --dirty=-dt
 runinstall   = $(bin_env) bin_find=$(bin_find)       \
                           bin_install=$(bin_install) \
                           $(srcroot)/source/install.sh
-runbundle    = $(bin_env) RAILS_ENV=production \
-                          GEM_HOME=./vendor/0  \
-                          ./vendor/bin/bundle
+runbundle    = $(bin_env) RAILS_ENV=production     \
+                          PATH=$$PATH:./vendor/bin \
+                          GEM_HOME=./vendor/bundle \
+                          bundle
+
+gitlab-src     = gitlabhq-6-2-stable
+gshell-src     = gitlab-shell-1.7.9
+gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/6-2-stable.tar.gz
+gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v1.7.9.tar.gz
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -r -f $(tmproot) build-gitlabhq install-gitlabhq install-gitolite
+	rm -r -f $(tmproot) build-gitlab install-gitlab install-gitlabshell
 	dh_clean
 
-build: get-orig-source build-arch build-indep
+build: build-arch build-indep
 
-build-arch: build-gitlabhq
+build-arch: build-gitlab
 
-build-indep: build-gitolite
+build-indep: build-gitlabshell
 
-build-gitlabhq:
+build-gitlab:
 	dh_testdir
 	mkdir -p $(tmproot)
-	cp -r $(srcroot)/source/gitlabhq.git $(tmproot)/gitlabhq.git
-	$(bin_gem) install --install-dir $(tmproot)/gitlabhq.git/vendor/0 \
-                           --bindir $(tmproot)/gitlabhq.git/vendor/bin    \
-                           --no-user-install                              \
-                           --no-rdoc                                      \
+	$(bin_wget) -O - $(gitlab-src-url) | $(bin_tar) -C $(tmproot) -x -z
+	$(bin_gem) install --install-dir $(tmproot)/$(gitlab-src)/vendor/bundle \
+                           --bindir $(tmproot)/$(gitlab-src)/vendor/bin         \
+                           --no-user-install                                    \
+                           --no-rdoc                                            \
                            --no-ri bundler
-	$(runinstall) $(srcroot)/source/gitlabhq/config  $(tmproot)/gitlabhq.git/config
-	$(runinstall) $(srcroot)/source/gitlabhq/bin     $(tmproot)/gitlabhq.git/vendor/bin
-	(cd $(tmproot)/gitlabhq.git && $(runbundle) install       \
-                                         --binstubs=./vendor/bin  \
-                                         --deployment             \
-                                         --without development test)
-	touch build-gitlabhq
+	$(runinstall) $(srcroot)/source/gitlab/config  $(tmproot)/$(gitlab-src)/config
+	$(runinstall) $(srcroot)/source/gitlab/bin     $(tmproot)/$(gitlab-src)/vendor/bin
+	(cd $(tmproot)/$(gitlab-src) && $(runbundle) install       \
+                                          --deployment             \
+                                          --without development test)
+	touch build-gitlab
 
-build-gitolite:
+build-gitlabshell:
 	dh_testdir
+	mkdir -p $(tmproot)
+	$(bin_wget) -O - $(gshell-src-url) | $(bin_tar) -C $(tmproot) -x -z
+	touch build-gitlabshell
 
-install: pre-install install-gitolite install-gitlabhq
+install: pre-install install-gitlabshell install-gitlab
 
 pre-install:
 	dh_testdir
@@ -59,32 +68,25 @@ pre-install:
 	dh_prep
 	dh_installdirs
 
-install-gitolite:
-	mkdir -p $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite
-	mkdir -p $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite/gitolite/src
-	mkdir -p $(debroot)/gitlabhq-gitolite/var/log/gitlabhq-gitolite
-	mkdir -p $(debroot)/gitlabhq-gitolite/usr/bin
-	touch $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite/.profile
-	chown 0750 $(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite
-	$(runinstall) $(srcroot)/source/gitolite.git/src $(debroot)/gitlabhq-gitolite/usr/share/gitlabhq-gitolite
-	$(getversion)                                   >$(debroot)/gitlabhq-gitolite/var/lib/gitlabhq-gitolite/gitolite/src/VERSION
-	$(runinstall) $(srcroot)/source/gitolite/libexec $(debroot)/gitlabhq-gitolite/usr/libexec/gitlabhq-gitolite
-	ln -s ../share/gitlabhq-gitolite/gitolite $(debroot)/gitlabhq-gitolite/usr/bin/gitolite
-	touch install-gitolite
+install-gitlabshell:
+	$(runinstall) $(tmproot)/$(gshell-src) $(debroot)/gitlabshell/var/lib/git/gitlab-shell
+	$(runinstall) $(srcroot)/source/gitlabshell/libexec $(debroot)/gitlabshell/usr/libexec/gitlab-shell
+	touch install-gitlabshell
 
-install-gitlabhq:
-	mkdir -p $(debroot)/gitlabhq/var/log/gitlabhq
-	mkdir -p $(debroot)/gitlabhq/var/lib/gitlabhq
-	chown 0750 $(debroot)/gitlabhq/var/lib/gitlabhq
-	$(runinstall) $(srcroot)/source/gitlabhq/libexec         $(debroot)/gitlabhq/usr/libexec/gitlabhq
-	$(runinstall) $(srcroot)/source/gitlabhq/etc/logrotate.d $(debroot)/gitlabhq/etc/logrotate.d
-	$(runinstall) $(srcroot)/source/gitlabhq/.ssh            $(debroot)/gitlabhq/var/lib/gitlabhq/.ssh
-	for f in app .bundle config db doc features lib public script vendor                                      \
-                 config.ru Gemfile Gemfile.lock Rakefile VERSION;                                                 \
-        do                                                                                                        \
-          $(runinstall) $(tmproot)/gitlabhq.git $(debroot)/gitlabhq/var/www/gitlabhq $(tmproot)/gitlabhq.git/$$f; \
+install-gitlab:
+	$(runinstall) $(srcroot)/source/gitlab/.ssh            $(debroot)/gitlab/var/lib/git/.ssh
+	$(runinstall) $(srcroot)/source/gitlab/libexec         $(debroot)/gitlab/usr/libexec/gitlab
+	$(runinstall) $(srcroot)/source/gitlab/etc/logrotate.d $(debroot)/gitlab/etc/logrotate.d
+	for f in app .bundle config db doc features lib public script vendor                                        \
+                 config.ru Gemfile Gemfile.lock Rakefile VERSION;                                                   \
+        do                                                                                                          \
+          $(runinstall) $(tmproot)/$(gitlab-src) $(debroot)/gitlab/var/lib/git/gitlab $(tmproot)/$(gitlab-src)/$$f; \
         done
-	touch install-gitlabhq
+	for l in rails unicorn unicorn_rails rake;                                      \
+        do                                                                              \
+          $(bin_ln) -s bundle_exec $(debroot)/gitlab/var/lib/git/gitlab/vendor/bin/$$l; \
+        done
+	touch install-gitlab
 
 binary: binary-indep binary-arch
 	dh_testdir
@@ -103,8 +105,5 @@ binary: binary-indep binary-arch
 binary-arch: build install
 
 binary-indep: build install
-
-get-orig-source:
-	$(bin_git) submodule init && $(bin_git) submodule update
 
 .PHONY: clean build build-arch build-indep binary binary-arch binary-indep install

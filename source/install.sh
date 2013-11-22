@@ -1,9 +1,5 @@
 #!/bin/sh
 
-bin_install=${bin_install:-install}
-bin_xargs=${bin_xargs:-xargs}
-bin_find=${bin_find:-find}
-
 _install_file () {
   local file srcfile dstfile dstdir
 
@@ -12,16 +8,16 @@ _install_file () {
   dstfile="${dstroot}/${srcfile}"
   dstdir=$(dirname "$dstfile")
   mkdir -p "$dstdir"
-  $bin_install "$file" "$dstfile"
+  cp --preserve=mode "$file" "$dstfile"
 }
 
 _install () {
-  if [ -f "$1" ]
+  if [ -f "$1" -o -h "$1" ]
   then
     _install_file "$1"
   elif [ -d  "$1" ]
   then
-    $bin_find "$1" -type f -print | while read f; \
+    find "$1" -type f -print | while read f; \
     do
       _install_file "$f"
     done

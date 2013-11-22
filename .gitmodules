@@ -1,6 +1,0 @@
-[submodule "source/gitolite.git"]
-	path = source/gitolite.git
-	url = https://github.com/gitlabhq/gitolite.git
-[submodule "source/gitlabhq.git"]
-	path = source/gitlabhq.git
-	url = https://github.com/gitlabhq/gitlabhq.git

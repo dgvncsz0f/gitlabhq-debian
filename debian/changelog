@@ -1,28 +1,34 @@
-gitlabhq (4.2-6) UNRELEASED; urgency=low
+gitlab (6.2-1) UNRELEASED; urgency=low
+
+  * gitlab v6.2
+
+ -- Diego Souza <dsouza@c0d3.xxx>  Fri, 22 Nov 2013 16:41:00 -0300
+
+gitlab (4.2-6) UNRELEASED; urgency=low
 
   * yaml-set now allows querying values (:dump action)
 
  -- Diego Souza <dsouza@c0d3.xxx>  Thu, 14 Mar 2013 10:30:00 -0300
 
-gitlabhq (4.2-5) UNRELEASED; urgency=low
+gitlab (4.2-5) UNRELEASED; urgency=low
 
   * adding postinst is now is able to configure gitlab.signaup_enabled
 
  -- Diego Souza <dsouza@c0d3.xxx>  Tue, 12 Mar 2013 09:30:00 -0300
 
-gitlabhq (4.2-4) UNRELEASED; urgency=low
+gitlab (4.2-4) UNRELEASED; urgency=low
 
   * postinst script now creates the backup directory (reads it from the debconf)
 
  -- Diego Souza <dsouza@c0d3.xxx>  Fri, 09 Feb 2013 18:00:00 -0300
 
-gitlabhq (4.2-3) UNRELEASED; urgency=low
+gitlab (4.2-3) UNRELEASED; urgency=low
 
   * adding logrotate.d file
 
  -- Diego Souza <dsouza@c0d3.xxx>  Fri, 08 Feb 2013 09:30:00 -0300
 
-gitlabhq (4.2-2) UNRELEASED; urgency=low
+gitlab (4.2-2) UNRELEASED; urgency=low
 
   * Updating to the latest gitlab 4.2
   * Adding ruby1.9.1 minimum version (the gitlab:setup talk fails for older versions)
@@ -31,20 +37,20 @@ gitlabhq (4.2-2) UNRELEASED; urgency=low
 
  -- Diego Souza <dsouza@c0d3.xxx>  Fri, 08 Feb 2013 01:27:01 -0300
 
-gitlabhq (4.2-1) UNRELEASED; urgency=low
+gitlab (4.2-1) UNRELEASED; urgency=low
 
   * Packing gitlab 4.2
- 
+
  -- Diego Souza <dsouza@c0d3.xxx>  Fri, 08 Feb 2013 01:27:00 -0300
 
-gitlabhq (4.1-1) UNRELEASED; urgency=low
+gitlab (4.1-1) UNRELEASED; urgency=low
 
   * Packing gitlab 4.1
   * Updating init.d script to use sidekiq instead of resque
 
  -- Diego Souza <dsouza@c0d3.xxx>  Fri, 01 Feb 2013 19:10:58 -0200
 
-gitlabhq (4.0-1) UNRELEASED; urgency=low
+gitlab (4.0-1) UNRELEASED; urgency=low
 
   * Initial release
   * This is my first public debian package

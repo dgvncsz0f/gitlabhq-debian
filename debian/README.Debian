@@ -7,7 +7,7 @@
 :todo: App initialization: rake gitlab:app:setup RAILS_ENV=production;
 :todo: Create an init script;
 
-Provides a debian binary package for gitlab & gitolite.
+Provides a debian binary package for gitlab & gitlabshell.
 
 Once you build this package, there is no need for `*-dev` packages. In
 other words, the package will compile nothing in production. I
@@ -68,13 +68,9 @@ This script makes sure the PATH and RAILS_ENV variables are defined:
 Available packages
 ==================
 
-* gitlabhq [v4.0.0]
+* gitlab [v6.3.0/TODO]
 
-* gitlabhq-gitolite [v3.04-42-g2d29cf7]
-
-* gitlabhq-nginx [TODO]
-
-* gitlabhq-apache2 [TODO]
+* gitlabshell [v1.7.x/TODO]
 
 Configuration Files
 ===================

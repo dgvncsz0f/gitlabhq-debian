@@ -1,10 +1,12 @@
 #!/bin/sh
 
+set -e
+
 case "$1" in
 
   (configure)
 
-    /usr/libexec/gitlabhq/postinst
+    /usr/libexec/gitlab-shell/postinst
 
     ;;
 

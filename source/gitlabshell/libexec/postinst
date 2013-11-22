@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+githome=/var/lib/git
+
+adduser --system            \
+        --shell /bin/sh     \
+        --gecos "Gitlab"    \
+        --quiet             \
+        --group             \
+        --no-create-home    \
+        --disabled-password \
+        --home $githome     \
+        git
+
+chown git:git $githome
+chown -R git:git $githome/gitlab-shell
+
+mkdir -p /var/log/gitlab-shell
+chown git /var/log/gitlab-shell

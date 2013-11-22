@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/usr/libexec/gitlab/env /var/lib/git/gitlab/vendor/bin/bundle exec $(basename $0) "$@"

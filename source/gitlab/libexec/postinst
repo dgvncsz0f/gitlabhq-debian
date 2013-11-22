@@ -1,0 +1,64 @@
+#!/bin/sh
+
+set -e
+
+githome=/var/lib/git
+
+bin_yamlset=/usr/libexec/gitlab/yaml-set
+
+adduser --system            \
+        --shell /bin/sh     \
+        --gecos "Gitlab"    \
+        --quiet             \
+        --group             \
+        --no-create-home    \
+        --disabled-password \
+        --home $githome     \
+        git
+
+chown git:git $githome
+chown -R git:git $githome/gitlab
+
+gitlabhq_deploy_keys () {
+  test -f $githome/.ssh/id_rsa || {
+    ssh-keygen -q -N "" -t rsa -f $githome/.ssh/id_rsa
+    cp $githome/.ssh/id_rsa.pub $githome/gitlab.pub
+  }
+}
+
+gitlabhq_mkdirs () {
+  for d in "$githome/.ssh" "$githome/repositories" "$githome/gitlab-satellites"
+  do
+    mkdir -p "$d"
+  done
+  mkdir -p /var/log/gitlab
+  mkdir -p $githome/gitlab/tmp
+  mkdir -p $githome/gitlab/tmp/sockets
+  mkdir -p $githome/gitlab/tmp/pids
+  mkdir -p $githome/gitlab/tmp/cache
+  mkdir -p $githome/gitlab/public/uploads
+  mkdir -p /var/backups/gitlab
+  test -h $githome/gitlab/log || ln -s /var/log/gitlab $githome/gitlab/log
+}
+
+gitlabhq_fixperms () {
+  chown git /var/log/gitlab
+  chown git $githome/gitlab-satellites
+  chown -R git:git $githome/.ssh
+  chmod 0700 $githome/.ssh
+  chmod 0400 $githome/.ssh/id_rsa
+  chmod 0444 $githome/.ssh/id_rsa.pub
+
+  for name in database.yml gitlab.yml
+  do
+    cfgfile=$githome/gitlab/config/$name
+    if [ -f "$cfgfile" ]
+    then
+      chmod 0600 $cfgfile
+    fi
+  done
+}
+
+gitlabhq_mkdirs
+gitlabhq_deploy_keys
+gitlabhq_fixperms

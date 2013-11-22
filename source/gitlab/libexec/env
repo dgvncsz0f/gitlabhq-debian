@@ -1,0 +1,5 @@
+#!/bin/sh
+
+exec env PATH=/var/lib/git/gitlab/vendor/bin:$PATH \
+         GEM_HOME=/var/lib/git/gitlab/vendor/bundle \
+         RAILS_ENV=${RAILS_ENV:-production} "$@"
