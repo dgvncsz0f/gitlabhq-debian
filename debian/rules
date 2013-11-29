@@ -21,9 +21,9 @@ runbundle    = $(bin_env) RAILS_ENV=production     \
                           GEM_HOME=./vendor/bundle \
                           bundle
 
-gitlab-src     = gitlabhq-6-2-stable
+gitlab-src     = gitlabhq-6-3-stable
 gshell-src     = gitlab-shell-1.7.9
-gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/6-2-stable.tar.gz
+gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/6-3-stable.tar.gz
 gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v1.7.9.tar.gz
 
 clean:
@@ -49,9 +49,9 @@ build-gitlab:
                            --no-ri bundler
 	$(runinstall) $(srcroot)/source/gitlab/config  $(tmproot)/$(gitlab-src)/config
 	$(runinstall) $(srcroot)/source/gitlab/bin     $(tmproot)/$(gitlab-src)/vendor/bin
-	(cd $(tmproot)/$(gitlab-src) && $(runbundle) install       \
-                                          --deployment             \
-                                          --without development test)
+	cd $(tmproot)/$(gitlab-src) && $(runbundle) install       \
+                                         --deployment             \
+                                         --without development test
 	touch build-gitlab
 
 build-gitlabshell:
