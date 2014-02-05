@@ -1,3 +1,10 @@
+gitlab (6.5-1) unstable; urgency=low
+
+  * gitlab v6.5
+  * gitlabshell v1.8.0
+
+ -- Diego Souza <dsouza@c0d3.xxx>  Wed, 05 Feb 2014 13:23:36 -0200
+
 gitlab (6.4.3-1) UNRELEASED; urgency=low
 
   * gitlab v6.4.3

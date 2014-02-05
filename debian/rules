@@ -21,9 +21,9 @@ runbundle    = $(bin_env) RAILS_ENV=production     \
                           GEM_HOME=./vendor/bundle \
                           bundle
 
-gitlab-src     = gitlabhq-6-4-stable
+gitlab-src     = gitlabhq-6-5-stable
 gshell-src     = gitlab-shell-1.8.0
-gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/6-4-stable.tar.gz
+gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/6-5-stable.tar.gz
 gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v1.8.0.tar.gz
 
 clean:
