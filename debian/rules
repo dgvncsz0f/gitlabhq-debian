@@ -12,7 +12,7 @@ bin_git     ?= git
 bin_install ?= install
 bin_env     ?= env
 bin_ln      ?= ln
-bin_gem     ?= gem2.1
+bin_gem     ?= gem
 runinstall   = $(bin_env) bin_find=$(bin_find)       \
                           bin_install=$(bin_install) \
                           $(srcroot)/source/install.sh
