@@ -51,7 +51,7 @@ build-gitlab:
 	$(runinstall) $(srcroot)/source/gitlab/bin     $(tmproot)/$(gitlab-src)/vendor/bin
 	cd $(tmproot)/$(gitlab-src) && $(runbundle) install       \
                                          --deployment             \
-                                         --without development test
+                                         --without development test postgres
 	touch build-gitlab
 
 build-gitlabshell:
