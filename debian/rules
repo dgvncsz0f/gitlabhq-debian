@@ -21,9 +21,9 @@ runbundle    = $(bin_env) RAILS_ENV=production     \
                           GEM_HOME=./vendor/bundle \
                           bundle
 
-gitlab-src     = gitlabhq-7-4-stable
+gitlab-src     = gitlabhq-7-3-stable
 gshell-src     = gitlab-shell-2.0.1
-gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/7-4-stable.tar.gz
+gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/7-3-stable.tar.gz
 gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v2.0.1.tar.gz
 
 clean:
@@ -77,7 +77,7 @@ install-gitlab:
 	$(runinstall) $(srcroot)/source/gitlab/.ssh            $(debroot)/gitlab/var/lib/git/.ssh
 	$(runinstall) $(srcroot)/source/gitlab/libexec         $(debroot)/gitlab/usr/libexec/gitlab
 	$(runinstall) $(srcroot)/source/gitlab/etc/logrotate.d $(debroot)/gitlab/etc/logrotate.d
-	for f in app .bundle config db doc features lib public script vendor                                        \
+	for f in bin app .bundle config db doc features lib public script vendor                                        \
                  config.ru Gemfile Gemfile.lock Rakefile VERSION;                                                   \
         do                                                                                                          \
           $(runinstall) $(tmproot)/$(gitlab-src) $(debroot)/gitlab/var/lib/git/gitlab $(tmproot)/$(gitlab-src)/$$f; \
