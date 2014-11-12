@@ -52,13 +52,13 @@ start() {
     chown $USER:$GROUP "$pidroot"
   }
 
-  /usr/libexec/gitlab/sudo-env $approot/script/web start
-  /usr/libexec/gitlab/sudo-env $approot/script/background_jobs start
+  /usr/libexec/gitlab/sudo-env $approot/bin/web start
+  /usr/libexec/gitlab/sudo-env $approot/bin/background_jobs start
 }
 
 stop() {
-  test -f $approot/tmp/pids/unicorn.pid && /usr/libexec/gitlab/sudo-env $approot/script/web stop
-  test -f $approot/tmp/pids/sidekid.pid && /usr/libexec/gitlab/sudo-env $approot/script/background_jobs stop
+  test -f $approot/tmp/pids/unicorn.pid && /usr/libexec/gitlab/sudo-env $approot/bin/web stop
+  test -f $approot/tmp/pids/sidekiq.pid && /usr/libexec/gitlab/sudo-env $approot/bin/background_jobs stop
 }
 
 case "$1" in
