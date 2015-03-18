@@ -29,7 +29,7 @@ gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v2.6.0.tar.gz
 clean:
 	dh_testdir
 	dh_testroot
-	rm -r -f $(tmproot) build-gitlab install-gitlab install-gitlabshell
+	rm -r -f $(tmproot) build-gitlab build-gitlabshell install-gitlab install-gitlabshell
 	dh_clean
 
 build: build-arch build-indep
