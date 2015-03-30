@@ -77,8 +77,8 @@ install-gitlab:
 	$(runinstall) $(srcroot)/source/gitlab/.ssh            $(debroot)/gitlab/var/lib/git/.ssh
 	$(runinstall) $(srcroot)/source/gitlab/libexec         $(debroot)/gitlab/usr/libexec/gitlab
 	$(runinstall) $(srcroot)/source/gitlab/etc/logrotate.d $(debroot)/gitlab/etc/logrotate.d
-	for f in bin app .bundle config db doc features lib public script vendor                                        \
-                 config.ru Gemfile Gemfile.lock Rakefile VERSION;                                                   \
+	for f in bin app .bundle config db doc features lib public script vendor                                    \
+                 config.ru Gemfile Gemfile.lock Rakefile VERSION GITLAB_SHELL_VERSION;                              \
         do                                                                                                          \
           $(runinstall) $(tmproot)/$(gitlab-src) $(debroot)/gitlab/var/lib/git/gitlab $(tmproot)/$(gitlab-src)/$$f; \
         done
