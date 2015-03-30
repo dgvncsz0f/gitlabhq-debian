@@ -13,5 +13,5 @@ Description: Gitlab replacement for gitolite
 
 Package: gitlab
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, build-essential, gitlabshell, ruby (>= 2.1.0), libicu-dev, libmysqlclient18, libicu48, debconf, dash, daemon, sudo, logrotate
+Depends: ${shlibs:Depends}, ${misc:Depends}, build-essential, gitlabshell, ruby (>= 2.1.0), libicu-dev, libmysqlclient18, libicu48, debconf, dash, daemon, sudo, logrotate, nodejs
 Description: Self hosted Git management software
