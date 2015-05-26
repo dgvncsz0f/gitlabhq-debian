@@ -12,7 +12,7 @@ bin_git     ?= git
 bin_install ?= install
 bin_env     ?= env
 bin_ln      ?= ln
-bin_gem     ?= gem
+bin_gem     ?= gem2.1
 runinstall   = $(bin_env) bin_find=$(bin_find)       \
                           bin_install=$(bin_install) \
                           $(srcroot)/source/install.sh
@@ -21,10 +21,10 @@ runbundle    = $(bin_env) RAILS_ENV=production     \
                           GEM_HOME=./vendor/bundle \
                           bundle
 
-gitlab-src     = gitlabhq-7-10-stable
-gshell-src     = gitlab-shell-2.6.2
-gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/7-10-stable.tar.gz
-gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v2.6.2.tar.gz
+gitlab-src     = gitlabhq-7-11-stable
+gshell-src     = gitlab-shell-2.6.3
+gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/7-11-stable.tar.gz
+gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v2.6.3.tar.gz
 
 clean:
 	dh_testdir
