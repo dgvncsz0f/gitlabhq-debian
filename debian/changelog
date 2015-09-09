@@ -1,3 +1,10 @@
+gitlab (7.14-1) stable; urgency=low
+
+  * gitlab v7.14
+  * gitlab-shell 2.6.4
+
+ -- Diego Souza <dsouza@c0d3.xxx>  Wed, 09 Sep 2015 17:53:04 -0300
+
 gitlab (7.12-1) stable; urgency=low
 
   * gitlab v7.12
