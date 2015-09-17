@@ -22,9 +22,9 @@ runbundle    = $(bin_env) RAILS_ENV=production     \
                           bundle
 
 gitlab-src     = gitlabhq-7-14-stable
-gshell-src     = gitlab-shell-2.6.4
+gshell-src     = gitlab-shell-2.6.5
 gitlab-src-url = https://github.com/gitlabhq/gitlabhq/archive/7-14-stable.tar.gz
-gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v2.6.4.tar.gz
+gshell-src-url = https://github.com/gitlabhq/gitlab-shell/archive/v2.6.5.tar.gz
 
 clean:
 	dh_testdir
